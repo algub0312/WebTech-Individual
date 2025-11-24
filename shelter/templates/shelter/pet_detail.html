@@ -1,0 +1,290 @@
+{% extends 'shelter/base.html' %}
+{% load static %}
+
+{% block title %}{{ pet.name }} - PawHaven Pet Shelter{% endblock %}
+
+{% block content %}
+<section class="pet-detail-section">
+    <div class="container">
+        <div class="pet-detail-layout">
+            <!-- Pet Images -->
+            <div class="pet-gallery">
+                {% if pet.main_image %}
+                    <img src="{{ pet.main_image.url }}" alt="{{ pet.name }}" class="main-pet-image">
+                {% else %}
+                    <img src="{% static 'shelter/images/pets/placeholder.jpg' %}" alt="{{ pet.name }}" class="main-pet-image">
+                {% endif %}
+                
+                {% if pet.get_all_images|length > 1 %}
+                <div class="thumbnail-gallery">
+                    {% for image in pet.get_all_images %}
+                    <img src="{{ image.url }}" alt="{{ pet.name }}" class="thumbnail">
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Pet Information -->
+            <div class="pet-details">
+                <div class="pet-header">
+                    <h1>{{ pet.name }}</h1>
+                    {% if pet.get_badge %}
+                    <span class="badge badge-secondary">{{ pet.get_badge }}</span>
+                    {% endif %}
+                    <span class="badge badge-primary">{{ pet.status|title }}</span>
+                </div>
+
+                <div class="pet-quick-info">
+                    <div class="info-item">
+                        <strong>Breed:</strong> {{ pet.breed }}
+                    </div>
+                    <div class="info-item">
+                        <strong>Age:</strong> {{ pet.age }}
+                    </div>
+                    <div class="info-item">
+                        <strong>Gender:</strong> {{ pet.gender }}
+                    </div>
+                    <div class="info-item">
+                        <strong>Size:</strong> {{ pet.size }}
+                    </div>
+                    <div class="info-item">
+                        <strong>Color:</strong> {{ pet.color }}
+                    </div>
+                </div>
+
+                <div class="pet-description">
+                    <h3>About {{ pet.name }}</h3>
+                    <p>{{ pet.description }}</p>
+                </div>
+
+                {% if pet.personality %}
+                <div class="pet-personality">
+                    <h3>Personality Traits</h3>
+                    <div class="traits-list">
+                        {% for trait in pet.personality %}
+                        <span class="trait-badge">{{ trait }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <div class="pet-medical">
+                    <h3>Medical Information</h3>
+                    <ul class="medical-list">
+                        <li>{% if pet.vaccinated %}✓{% else %}✗{% endif %} Vaccinated</li>
+                        <li>{% if pet.spayed_neutered %}✓{% else %}✗{% endif %} Spayed/Neutered</li>
+                        <li>{% if pet.microchipped %}✓{% else %}✗{% endif %} Microchipped</li>
+                        {% if pet.special_needs %}
+                        <li class="special-needs">
+                            ⚠️ Special Needs
+                            {% if pet.special_needs_description %}
+                            <p>{{ pet.special_needs_description }}</p>
+                            {% endif %}
+                        </li>
+                        {% endif %}
+                    </ul>
+                </div>
+
+                <div class="adoption-info">
+                    <h3>Adoption Details</h3>
+                    <p class="adoption-fee">Adoption Fee: <strong>${{ pet.adoption_fee }}</strong></p>
+                    <p class="arrival-date">At shelter since: {{ pet.arrival_date|date:"F d, Y" }}</p>
+                </div>
+
+                {% if pet.status == 'available' %}
+                <div class="adoption-actions">
+                    <a href="{% url 'adoption_application_pet' pet.pk %}" class="btn btn-primary btn-large">
+                        Apply to Adopt {{ pet.name }}
+                    </a>
+                    <a href="{% url 'contact' %}" class="btn btn-secondary">
+                        Contact Us About {{ pet.name }}
+                    </a>
+                </div>
+                {% elif pet.status == 'pending' %}
+                <div class="status-message pending">
+                    <p>{{ pet.name }} has a pending adoption application.</p>
+                </div>
+                {% elif pet.status == 'adopted' %}
+                <div class="status-message adopted">
+                    <p>{{ pet.name }} has been adopted! Check out our other available pets.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Related Pets -->
+        {% if related_pets %}
+        <div class="related-pets">
+            <h2>Other {{ pet.type|title }}s Looking for Homes</h2>
+            <div class="pets-grid">
+                {% for related_pet in related_pets %}
+                <article class="pet-card">
+                    <div class="pet-image">
+                        {% if related_pet.main_image %}
+                            <img src="{{ related_pet.main_image.url }}" alt="{{ related_pet.name }}">
+                        {% else %}
+                            <img src="{% static 'shelter/images/pets/placeholder.jpg' %}" alt="{{ related_pet.name }}">
+                        {% endif %}
+                        {% if related_pet.get_badge %}
+                        <div class="pet-badge">{{ related_pet.get_badge }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="pet-info">
+                        <h3 class="pet-name">{{ related_pet.name }}</h3>
+                        <p class="pet-breed">{{ related_pet.breed }}</p>
+                        <p class="pet-age">{{ related_pet.age }}</p>
+                        <a href="{% url 'pet_detail' related_pet.pk related_pet.slug %}" class="btn btn-small">Meet {{ related_pet.name }}</a>
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<style>
+/* Pet Detail Specific Styles */
+.pet-detail-section {
+    padding: var(--spacing-3xl) 0;
+    background: var(--background);
+}
+
+.pet-detail-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-3xl);
+    margin-bottom: var(--spacing-3xl);
+}
+
+.pet-gallery {
+    position: sticky;
+    top: 100px;
+    height: fit-content;
+}
+
+.main-pet-image {
+    width: 100%;
+    height: 500px;
+    object-fit: cover;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+}
+
+.thumbnail-gallery {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-md);
+}
+
+.thumbnail {
+    width: 100%;
+    height: 100px;
+    object-fit: cover;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.thumbnail:hover {
+    transform: scale(1.05);
+}
+
+.pet-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-xl);
+}
+
+.pet-header h1 {
+    margin-bottom: 0;
+}
+
+.pet-quick-info {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-md);
+    padding: var(--spacing-xl);
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--spacing-xl);
+}
+
+.info-item {
+    padding: var(--spacing-sm);
+}
+
+.pet-description,
+.pet-personality,
+.pet-medical,
+.adoption-info {
+    background: var(--white);
+    padding: var(--spacing-xl);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--spacing-xl);
+}
+
+.traits-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+}
+
+.medical-list {
+    list-style: none;
+    padding: 0;
+}
+
+.medical-list li {
+    padding: var(--spacing-sm) 0;
+    border-bottom: 1px solid var(--gray-light);
+}
+
+.special-needs {
+    color: var(--warning);
+    font-weight: 600;
+}
+
+.adoption-fee {
+    font-size: var(--font-size-xl);
+    color: var(--primary-color);
+}
+
+.adoption-actions {
+    display: flex;
+    gap: var(--spacing-lg);
+    margin-top: var(--spacing-xl);
+}
+
+.status-message {
+    padding: var(--spacing-xl);
+    border-radius: var(--radius-lg);
+    text-align: center;
+    font-weight: 600;
+    font-size: var(--font-size-lg);
+}
+
+.status-message.pending {
+    background: var(--warning);
+    color: var(--text-dark);
+}
+
+.status-message.adopted {
+    background: var(--success);
+    color: var(--white);
+}
+
+.related-pets {
+    margin-top: var(--spacing-3xl);
+    padding-top: var(--spacing-3xl);
+    border-top: 2px solid var(--gray-light);
+}
+
+.related-pets h2 {
+    text-align: center;
+    margin-bottom: var(--spacing-2xl);
+}
+</style>
+{% endblock %}

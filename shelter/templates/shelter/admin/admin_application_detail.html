@@ -1,0 +1,510 @@
+{% extends 'shelter/base.html' %}
+{% load static %}
+
+{% block title %}Application Details - {{ application.first_name }} {{ application.last_name }}{% endblock %}
+
+{% block content %}
+<section class="admin-hero">
+    <div class="container">
+        <h1>Application Details</h1>
+        <p class="lead">{{ application.first_name }} {{ application.last_name }} - {{ application.pet.name }}</p>
+    </div>
+</section>
+
+<section class="admin-content">
+    <div class="container">
+        <div class="admin-layout">
+            <!-- Sidebar Navigation -->
+            <aside class="admin-sidebar">
+                <nav class="admin-nav">
+                    <div class="admin-profile-header">
+                        <h4>{{ user.first_name|default:user.username }}</h4>
+                        <p class="admin-role">Administrator</p>
+                    </div>
+                    <a href="{% url 'admin_dashboard' %}" class="nav-item">
+                        <span class="nav-icon">📊</span>
+                        Dashboard
+                    </a>
+                    <a href="{% url 'admin_applications' %}" class="nav-item active">
+                        <span class="nav-icon">📝</span>
+                        All Applications
+                    </a>
+                    <a href="{% url 'admin_pets' %}" class="nav-item">
+                        <span class="nav-icon">🐾</span>
+                        Manage Pets
+                    </a>
+                    <a href="{% url 'admin_contacts' %}" class="nav-item">
+                        <span class="nav-icon">📞</span>
+                        Contact Messages
+                    </a>
+                    <a href="/admin/" class="nav-item">
+                        <span class="nav-icon">⚙️</span>
+                        Django Admin
+                    </a>
+                    <div class="nav-divider"></div>
+                    <a href="{% url 'pets' %}" class="nav-item">
+                        <span class="nav-icon">🏠</span>
+                        Public Site
+                    </a>
+                    <a href="{% url 'logout' %}" class="nav-item">
+                        <span class="nav-icon">🚪</span>
+                        Logout
+                    </a>
+                </nav>
+            </aside>
+
+            <!-- Main Content -->
+            <div class="admin-main">
+                <!-- Application Header -->
+                <div class="application-header">
+                    <div class="header-info">
+                        <h2>{{ application.first_name }} {{ application.last_name }}</h2>
+                        <p class="application-id">Application #{{ application.id }}</p>
+                        <p class="submission-date">Submitted: {{ application.submitted_at|date:"F d, Y g:i A" }}</p>
+                    </div>
+                    <div class="header-actions">
+                        <form method="post" action="{% url 'admin_update_application_status' application.id %}" class="status-form">
+                            {% csrf_token %}
+                            <label for="status">Status:</label>
+                            <select name="status" id="status" onchange="this.form.submit()" class="status-select status-{{ application.status }}">
+                                <option value="pending" {% if application.status == 'pending' %}selected{% endif %}>Pending Review</option>
+                                <option value="approved" {% if application.status == 'approved' %}selected{% endif %}>Approved</option>
+                                <option value="rejected" {% if application.status == 'rejected' %}selected{% endif %}>Rejected</option>
+                                <option value="completed" {% if application.status == 'completed' %}selected{% endif %}>Adoption Completed</option>
+                            </select>
+                        </form>
+                        <a href="{% url 'admin_applications' %}" class="btn btn-outline">← Back to Applications</a>
+                    </div>
+                </div>
+
+                <!-- Pet Information -->
+                <div class="pet-section">
+                    <h3>Pet Information</h3>
+                    <div class="pet-details">
+                        <div class="pet-image">
+                            {% if application.pet.main_image %}
+                            <img src="{{ application.pet.main_image.url }}" alt="{{ application.pet.name }}">
+                            {% else %}
+                            <img src="{% static 'shelter/images/pets/placeholder.jpg' %}" alt="{{ application.pet.name }}">
+                            {% endif %}
+                        </div>
+                        <div class="pet-info">
+                            <h4>{{ application.pet.name }}</h4>
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <strong>Breed:</strong> {{ application.pet.breed }}
+                                </div>
+                                <div class="info-item">
+                                    <strong>Age:</strong> {{ application.pet.age }}
+                                </div>
+                                <div class="info-item">
+                                    <strong>Gender:</strong> {{ application.pet.gender }}
+                                </div>
+                                <div class="info-item">
+                                    <strong>Size:</strong> {{ application.pet.size }}
+                                </div>
+                                <div class="info-item">
+                                    <strong>Adoption Fee:</strong> ${{ application.pet.adoption_fee }}
+                                </div>
+                                <div class="info-item">
+                                    <strong>Special Needs:</strong> {% if application.pet.special_needs %}Yes{% else %}No{% endif %}
+                                </div>
+                            </div>
+                            <a href="{% url 'pet_detail' application.pet.pk application.pet.slug %}" class="btn btn-small btn-primary">View Pet Details</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Applicant Information -->
+                <div class="applicant-section">
+                    <h3>Applicant Information</h3>
+                    <div class="info-sections">
+                        <div class="section">
+                            <h4>Contact Information</h4>
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <strong>Name:</strong> {{ application.first_name }} {{ application.last_name }}
+                                </div>
+                                <div class="info-item">
+                                    <strong>Email:</strong> <a href="mailto:{{ application.email }}">{{ application.email }}</a>
+                                </div>
+                                <div class="info-item">
+                                    <strong>Phone:</strong> <a href="tel:{{ application.phone }}">{{ application.phone }}</a>
+                                </div>
+                                <div class="info-item full-width">
+                                    <strong>Address:</strong> {{ application.address }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="section">
+                            <h4>Housing Information</h4>
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <strong>Housing Type:</strong> {{ application.housing_type|title }}
+                                </div>
+                                <div class="info-item">
+                                    <strong>Own or Rent:</strong> {{ application.own_or_rent|title }}
+                                </div>
+                                {% if application.own_or_rent == 'rent' %}
+                                <div class="info-item">
+                                    <strong>Landlord Approval:</strong> {% if application.landlord_approval %}Yes{% else %}No{% endif %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="section">
+                            <h4>Household Information</h4>
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <strong>Adults:</strong> {{ application.household_adults }}
+                                </div>
+                                <div class="info-item">
+                                    <strong>Children:</strong> {{ application.household_children }}
+                                </div>
+                                <div class="info-item">
+                                    <strong>Other Pets:</strong> {% if application.has_other_pets %}Yes{% else %}No{% endif %}
+                                </div>
+                                {% if application.has_other_pets and application.other_pets_description %}
+                                <div class="info-item full-width">
+                                    <strong>Other Pets Description:</strong>
+                                    <p>{{ application.other_pets_description }}</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="section">
+                            <h4>Experience & Motivation</h4>
+                            <div class="text-sections">
+                                <div class="text-item">
+                                    <strong>Previous Pet Experience:</strong>
+                                    <p>{{ application.previous_pet_experience }}</p>
+                                </div>
+                                <div class="text-item">
+                                    <strong>Reason for Adoption:</strong>
+                                    <p>{{ application.reason_for_adoption }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Admin Notes -->
+                <div class="notes-section">
+                    <h3>Admin Notes</h3>
+                    <form method="post" action="{% url 'admin_update_application_notes' application.id %}" class="notes-form">
+                        {% csrf_token %}
+                        <textarea name="notes" rows="4" placeholder="Add notes about this application..." class="notes-textarea">{{ application.notes }}</textarea>
+                        <button type="submit" class="btn btn-primary">Save Notes</button>
+                    </form>
+                    {% if application.reviewed_at %}
+                    <p class="review-info">Last reviewed: {{ application.reviewed_at|date:"F d, Y g:i A" }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="actions-section">
+                    <h3>Quick Actions</h3>
+                    <div class="action-buttons">
+                        <a href="mailto:{{ application.email }}?subject=Regarding your adoption application for {{ application.pet.name }}" 
+                           class="btn btn-secondary">📧 Email Applicant</a>
+                        <a href="tel:{{ application.phone }}" class="btn btn-outline">📞 Call Applicant</a>
+                        <a href="{% url 'pet_detail' application.pet.pk application.pet.slug %}" class="btn btn-outline">🐾 View Pet</a>
+                        {% if application.status == 'approved' %}
+                        <form method="post" action="{% url 'admin_update_application_status' application.id %}" style="display: inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="status" value="completed">
+                            <button type="submit" class="btn btn-success" onclick="return confirm('Mark this adoption as completed?')">
+                                ✅ Mark as Completed
+                            </button>
+                        </form>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+.admin-hero {
+    background: linear-gradient(135deg, var(--accent-color) 0%, var(--primary-color) 100%);
+    color: var(--white);
+    padding: var(--spacing-2xl) 0;
+    text-align: center;
+}
+
+.admin-content {
+    padding: var(--spacing-3xl) 0;
+}
+
+.admin-layout {
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    gap: var(--spacing-3xl);
+}
+
+.admin-sidebar {
+    position: sticky;
+    top: 100px;
+    height: fit-content;
+}
+
+.admin-nav {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    box-shadow: var(--shadow-md);
+}
+
+.admin-profile-header {
+    text-align: center;
+    padding: var(--spacing-lg) 0;
+    border-bottom: 2px solid var(--background);
+    margin-bottom: var(--spacing-lg);
+}
+
+.admin-profile-header h4 {
+    color: var(--accent-color);
+    margin-bottom: var(--spacing-xs);
+}
+
+.admin-role {
+    color: var(--text-light);
+    font-size: var(--font-size-sm);
+    margin: 0;
+}
+
+.nav-divider {
+    height: 1px;
+    background: var(--background);
+    margin: var(--spacing-md) 0;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+    color: var(--text-dark);
+    text-decoration: none;
+    border-radius: var(--radius-md);
+    transition: var(--transition);
+    margin-bottom: var(--spacing-sm);
+}
+
+.nav-item:hover {
+    background: var(--background);
+}
+
+.nav-icon {
+    font-size: var(--font-size-xl);
+}
+
+.admin-main {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xl);
+}
+
+.application-header,
+.pet-section,
+.applicant-section,
+.notes-section,
+.actions-section {
+    background: var(--white);
+    padding: var(--spacing-xl);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+}
+
+.application-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.application-header h2 {
+    color: var(--accent-color);
+    margin-bottom: var(--spacing-xs);
+}
+
+.application-id,
+.submission-date {
+    color: var(--text-light);
+    font-size: var(--font-size-sm);
+    margin: var(--spacing-xs) 0;
+}
+
+.header-actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    align-items: flex-end;
+}
+
+.status-form {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.status-select {
+    padding: var(--spacing-sm);
+    border: 2px solid var(--gray-medium);
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.status-select.status-pending {
+    background: var(--warning);
+    color: var(--text-dark);
+}
+
+.status-select.status-approved {
+    background: var(--success);
+    color: var(--white);
+}
+
+.status-select.status-rejected {
+    background: var(--danger);
+    color: var(--white);
+}
+
+.status-select.status-completed {
+    background: var(--accent-color);
+    color: var(--white);
+}
+
+.pet-section h3,
+.applicant-section h3,
+.notes-section h3,
+.actions-section h3 {
+    color: var(--accent-color);
+    margin-bottom: var(--spacing-lg);
+    border-bottom: 2px solid var(--accent-color);
+    padding-bottom: var(--spacing-sm);
+}
+
+.pet-details {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: var(--spacing-xl);
+    align-items: start;
+}
+
+.pet-image img {
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
+    border-radius: var(--radius-md);
+}
+
+.pet-info h4 {
+    color: var(--primary-color);
+    margin-bottom: var(--spacing-lg);
+    font-size: var(--font-size-xl);
+}
+
+.info-sections {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xl);
+}
+
+.section h4 {
+    color: var(--primary-color);
+    margin-bottom: var(--spacing-md);
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-md);
+}
+
+.info-item {
+    padding: var(--spacing-md);
+    background: var(--background);
+    border-radius: var(--radius-md);
+}
+
+.info-item.full-width {
+    grid-column: 1 / -1;
+}
+
+.text-sections {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+}
+
+.text-item {
+    padding: var(--spacing-lg);
+    background: var(--background);
+    border-radius: var(--radius-md);
+}
+
+.text-item strong {
+    display: block;
+    margin-bottom: var(--spacing-sm);
+    color: var(--primary-color);
+}
+
+.text-item p {
+    line-height: 1.6;
+    margin: 0;
+}
+
+.notes-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.notes-textarea {
+    width: 100%;
+    padding: var(--spacing-md);
+    border: 2px solid var(--gray-medium);
+    border-radius: var(--radius-md);
+    font-family: inherit;
+    resize: vertical;
+}
+
+.notes-textarea:focus {
+    outline: none;
+    border-color: var(--accent-color);
+}
+
+.review-info {
+    margin-top: var(--spacing-md);
+    color: var(--text-light);
+    font-size: var(--font-size-sm);
+}
+
+.action-buttons {
+    display: flex;
+    gap: var(--spacing-md);
+    flex-wrap: wrap;
+}
+
+.btn-success {
+    background: var(--success);
+    color: var(--white);
+    border: 2px solid var(--success);
+}
+
+.btn-success:hover {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.lead {
+    font-size: var(--font-size-xl);
+    opacity: 0.9;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,237 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}PawHaven - Pet Shelter{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'shelter/css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'shelter/css/components.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Header with Navigation -->
+    <header class="main-header">
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="nav-logo">
+                    <img src="{% static 'shelter/images/icons/logo.png' %}" alt="PawHaven Logo">
+                    <span class="logo-text">PawHaven</span>
+                </div>
+                
+                <!-- Desktop Navigation Menu -->
+                <ul class="nav-menu">
+                    <li><a href="{% url 'home' %}" class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}">Home</a></li>
+                    <li><a href="{% url 'pets' %}" class="nav-link {% if request.resolver_match.url_name == 'pets' %}active{% endif %}">Find a Pet</a></li>
+                    <li><a href="{% url 'about' %}" class="nav-link {% if request.resolver_match.url_name == 'about' %}active{% endif %}">About Us</a></li>
+                    <li><a href="{% url 'success_stories' %}" class="nav-link {% if request.resolver_match.url_name == 'success_stories' %}active{% endif %}">Success Stories</a></li>
+                    <li><a href="{% url 'contact' %}" class="nav-link {% if request.resolver_match.url_name == 'contact' %}active{% endif %}">Contact</a></li>
+                    
+                    {% if user.is_authenticated %}
+                        {% if user.is_staff or user.is_superuser %}
+                        <!-- Admin Navigation -->
+                        <li><a href="{% url 'admin_dashboard' %}" class="nav-link admin-nav-link {% if 'admin_dashboard' in request.resolver_match.url_name or 'admin_applications' in request.resolver_match.url_name or 'admin_pets' in request.resolver_match.url_name or 'admin_contacts' in request.resolver_match.url_name %}active{% endif %}">
+                            🛡️ Admin Dashboard
+                        </a></li>
+                        {% else %}
+                        <!-- Regular User Navigation -->
+                        <li><a href="{% url 'account' %}" class="nav-link {% if request.resolver_match.url_name == 'account' or request.resolver_match.url_name == 'user_applications' %}active{% endif %}">My Account</a></li>
+                        {% endif %}
+                        <li><a href="{% url 'logout' %}" class="nav-link logout-link">Logout ({{ user.username }})</a></li>
+                    {% else %}
+                        <li><a href="{% url 'site_login' %}" class="nav-link {% if request.resolver_match.url_name == 'site_login' %}active{% endif %}">Login</a></li>
+                        <li><a href="{% url 'register' %}" class="nav-link {% if request.resolver_match.url_name == 'register' %}active{% endif %}">Register</a></li>
+                    {% endif %}
+                    <li><a href="{% url 'adoption_gate' %}" class="nav-link btn-adopt">Adopt Now</a></li>               
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Django Messages -->
+    {% if messages %}
+    <div class="messages-container">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Main Content -->
+    <main class="main-content">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>PawHaven Shelter</h4>
+                    <p>Dedicated to finding loving homes for pets in need since 2016.</p>
+                    <ul>
+                        <li><a href="{% url 'pets' %}">Available Pets</a></li>
+                        <li><a href="{% url 'adoption_process' %}">Adoption Process</a></li>
+                        <li><a href="{% url 'about' %}">About Us</a></li>
+                        <li><a href="{% url 'contact' %}">Contact</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4>Contact Info</h4>
+                    <div class="contact-info">
+                        <p>📍 123 Pet Street, Animal City, AC 12345</p>
+                        <p>📞 (555) 123-PETS</p>
+                        <p>✉️ info@pawhaven.com</p>
+                    </div>
+                </div>
+
+                <div class="footer-section">
+                    <h4>Shelter Hours</h4>
+                    <div class="hours">
+                        <p>Monday - Friday: 10am - 6pm</p>
+                        <p>Saturday: 9am - 5pm</p>
+                        <p>Sunday: 12pm - 4pm</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2024 PawHaven Pet Shelter. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="{% static 'shelter/js/main.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+
+    <style>
+    /* Improved navigation styling */
+    .nav-menu {
+        gap: var(--spacing-md);
+    }
+    
+    .admin-nav-link {
+        background: linear-gradient(135deg, var(--accent-color), var(--primary-color));
+        color: var(--white) !important;
+        border-radius: var(--radius-md);
+        padding: var(--spacing-sm) var(--spacing-lg) !important;
+        font-weight: 600;
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+    }
+    
+    .admin-nav-link:hover {
+        background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+    
+    .admin-nav-link.active {
+        border-color: rgba(255, 255, 255, 0.3);
+        box-shadow: var(--shadow-lg);
+    }
+    
+    .logout-link {
+        font-size: var(--font-size-sm);
+        opacity: 0.8;
+    }
+    
+    .logout-link:hover {
+        opacity: 1;
+    }
+    
+    /* RESPONSIVE FIXES FOR LAPTOP SCREENS */
+    
+    /* For laptop screens (1200px - 1400px) */
+    @media (max-width: 1400px) {
+        .nav-menu {
+            gap: 0.5rem;
+        }
+        
+        .nav-link {
+            padding: 0.4rem 0.7rem !important;
+            font-size: 0.85rem;
+        }
+        
+        .admin-nav-link {
+            padding: 0.4rem 0.8rem !important;
+            font-size: 0.85rem;
+        }
+        
+        .logout-link {
+            font-size: 0.75rem;
+        }
+        
+        .logo-text {
+            font-size: 1.3rem;
+        }
+    }
+
+    /* For smaller laptop screens (below 1200px) */
+    @media (max-width: 1200px) {
+        .nav-container {
+            padding: 0 0.5rem;
+        }
+        
+        .nav-menu {
+            gap: 0.3rem;
+        }
+        
+        .nav-link {
+            padding: 0.3rem 0.5rem !important;
+            font-size: 0.8rem;
+        }
+        
+        .admin-nav-link {
+            padding: 0.3rem 0.6rem !important;
+            font-size: 0.8rem;
+        }
+        
+        .btn-adopt {
+            padding: 0.3rem 0.6rem !important;
+            font-size: 0.8rem;
+        }
+        
+        .logo-text {
+            font-size: 1.2rem;
+        }
+        
+        .nav-logo img {
+            height: 30px;
+        }
+    }
+
+    /* Make username shorter on small screens */
+    @media (max-width: 1300px) {
+        .logout-link {
+            max-width: 120px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    }
+    
+    /* Extra small laptops */
+    @media (max-width: 1100px) {
+        .nav-menu {
+            gap: 0.2rem;
+        }
+        
+        .nav-link {
+            padding: 0.3rem 0.4rem !important;
+            font-size: 0.75rem;
+        }
+        
+        .admin-nav-link {
+            padding: 0.3rem 0.5rem !important;
+            font-size: 0.75rem;
+        }
+    }
+    </style>
+</body>
+</html>

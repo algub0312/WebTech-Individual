@@ -1,0 +1,461 @@
+{% extends 'shelter/base.html' %}
+{% load static %}
+
+{% block title %}Manage Applications - Admin Dashboard{% endblock %}
+
+{% block content %}
+<section class="admin-hero">
+    <div class="container">
+        <h1>Manage Applications</h1>
+        <p class="lead">Review and update adoption application statuses</p>
+    </div>
+</section>
+
+<section class="admin-content">
+    <div class="container">
+        <div class="admin-layout">
+            <!-- Sidebar Navigation -->
+            <aside class="admin-sidebar">
+                <nav class="admin-nav">
+                    <div class="admin-profile-header">
+                        <h4>{{ user.first_name|default:user.username }}</h4>
+                        <p class="admin-role">Administrator</p>
+                    </div>
+                    <a href="{% url 'admin_dashboard' %}" class="nav-item">
+                        <span class="nav-icon">📊</span>
+                        Dashboard
+                    </a>
+                    <a href="{% url 'admin_applications' %}" class="nav-item active">
+                        <span class="nav-icon">📝</span>
+                        All Applications
+                    </a>
+                    <a href="{% url 'admin_pets' %}" class="nav-item">
+                        <span class="nav-icon">🐾</span>
+                        Manage Pets
+                    </a>
+                    <a href="{% url 'admin_contacts' %}" class="nav-item">
+                        <span class="nav-icon">📞</span>
+                        Contact Messages
+                    </a>
+                    <a href="/admin/" class="nav-item">
+                        <span class="nav-icon">⚙️</span>
+                        Django Admin
+                    </a>
+                    <div class="nav-divider"></div>
+                    <a href="{% url 'pets' %}" class="nav-item">
+                        <span class="nav-icon">🏠</span>
+                        Public Site
+                    </a>
+                    <a href="{% url 'logout' %}" class="nav-item">
+                        <span class="nav-icon">🚪</span>
+                        Logout
+                    </a>
+                </nav>
+            </aside>
+
+            <!-- Main Content -->
+            <div class="admin-main">
+                <!-- Filters and Search -->
+                <div class="filters-section">
+                    <div class="section-header">
+                        <h2>All Applications ({{ total_applications }})</h2>
+                        <div class="filter-controls">
+                            <form method="get" class="filter-form">
+                                <select name="status" onchange="this.form.submit()">
+                                    <option value="">All Statuses</option>
+                                    <option value="pending" {% if request.GET.status == 'pending' %}selected{% endif %}>Pending</option>
+                                    <option value="approved" {% if request.GET.status == 'approved' %}selected{% endif %}>Approved</option>
+                                    <option value="rejected" {% if request.GET.status == 'rejected' %}selected{% endif %}>Rejected</option>
+                                    <option value="completed" {% if request.GET.status == 'completed' %}selected{% endif %}>Completed</option>
+                                </select>
+                                <input type="text" name="search" placeholder="Search by applicant name, email, or pet name..." 
+                                       value="{{ request.GET.search }}" class="search-input">
+                                <button type="submit" class="btn btn-small btn-primary">Filter</button>
+                                <a href="{% url 'admin_applications' %}" class="btn btn-small btn-outline">Clear</a>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Applications Table -->
+                <div class="applications-section">
+                    {% if applications %}
+                    <div class="applications-table">
+                        {% for application in applications %}
+                        <div class="application-row">
+                            <div class="application-info">
+                                <div class="applicant-column">
+                                    <h3>{{ application.first_name }} {{ application.last_name }}</h3>
+                                    <p class="application-email">{{ application.email }}</p>
+                                    <p class="application-phone">📞 {{ application.phone }}</p>
+                                    <p class="application-date">{{ application.submitted_at|date:"M d, Y g:i A" }}</p>
+                                </div>
+                                <div class="pet-column">
+                                    <h4>{{ application.pet.name }}</h4>
+                                    <p>{{ application.pet.breed }}</p>
+                                    <p>{{ application.pet.age }} • {{ application.pet.size }}</p>
+                                    <p class="adoption-fee">${{ application.pet.adoption_fee }}</p>
+                                </div>
+                                <div class="details-column">
+                                    <p><strong>Housing:</strong> {{ application.housing_type|title }} ({{ application.own_or_rent|title }})</p>
+                                    <p><strong>Adults:</strong> {{ application.household_adults }}, <strong>Children:</strong> {{ application.household_children }}</p>
+                                    <p><strong>Other pets:</strong> {% if application.has_other_pets %}Yes{% else %}No{% endif %}</p>
+                                    {% if application.special_needs %}
+                                    <p class="special-needs">⚠️ Special needs pet</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="status-column">
+                                <form method="post" action="{% url 'admin_update_application_status' application.id %}" class="status-form">
+                                    {% csrf_token %}
+                                    <select name="status" onchange="this.form.submit()" class="status-select status-{{ application.status }}">
+                                        <option value="pending" {% if application.status == 'pending' %}selected{% endif %}>Pending</option>
+                                        <option value="approved" {% if application.status == 'approved' %}selected{% endif %}>Approved</option>
+                                        <option value="rejected" {% if application.status == 'rejected' %}selected{% endif %}>Rejected</option>
+                                        <option value="completed" {% if application.status == 'completed' %}selected{% endif %}>Completed</option>
+                                    </select>
+                                </form>
+                                {% if application.reviewed_at %}
+                                <p class="review-date">Reviewed: {{ application.reviewed_at|date:"M d" }}</p>
+                                {% endif %}
+                            </div>
+
+                            <div class="actions-column">
+                                <a href="{% url 'admin_application_detail' application.id %}" class="btn btn-small btn-primary">Details</a>
+                                <a href="{% url 'pet_detail' application.pet.pk application.pet.slug %}" class="btn btn-small btn-outline">View Pet</a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Pagination -->
+                    {% if is_paginated %}
+                    <div class="pagination-container">
+                        <div class="pagination">
+                            {% if page_obj.has_previous %}
+                            <a href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" 
+                               class="pagination-btn">← Previous</a>
+                            {% endif %}
+                            
+                            <span class="page-info">
+                                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                            </span>
+                            
+                            {% if page_obj.has_next %}
+                            <a href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" 
+                               class="pagination-btn">Next →</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% else %}
+                    <div class="no-applications">
+                        <h3>No applications found</h3>
+                        <p>No applications match your current filters.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+.admin-hero {
+    background: linear-gradient(135deg, var(--accent-color) 0%, var(--primary-color) 100%);
+    color: var(--white);
+    padding: var(--spacing-2xl) 0;
+    text-align: center;
+}
+
+.admin-content {
+    padding: var(--spacing-3xl) 0;
+}
+
+.admin-layout {
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    gap: var(--spacing-3xl);
+}
+
+.admin-sidebar {
+    position: sticky;
+    top: 100px;
+    height: fit-content;
+}
+
+.admin-nav {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    box-shadow: var(--shadow-md);
+}
+
+.admin-profile-header {
+    text-align: center;
+    padding: var(--spacing-lg) 0;
+    border-bottom: 2px solid var(--background);
+    margin-bottom: var(--spacing-lg);
+}
+
+.admin-profile-header h4 {
+    color: var(--accent-color);
+    margin-bottom: var(--spacing-xs);
+}
+
+.admin-role {
+    color: var(--text-light);
+    font-size: var(--font-size-sm);
+    margin: 0;
+}
+
+.nav-divider {
+    height: 1px;
+    background: var(--background);
+    margin: var(--spacing-md) 0;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+    color: var(--text-dark);
+    text-decoration: none;
+    border-radius: var(--radius-md);
+    transition: var(--transition);
+    margin-bottom: var(--spacing-sm);
+}
+
+.nav-item:hover {
+    background: var(--background);
+}
+
+.nav-item.active {
+    background: var(--accent-color);
+    color: var(--white);
+}
+
+.nav-icon {
+    font-size: var(--font-size-xl);
+}
+
+.admin-main {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xl);
+}
+
+.filters-section {
+    background: var(--white);
+    padding: var(--spacing-xl);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+}
+
+.section-header h2 {
+    color: var(--accent-color);
+    margin-bottom: 0;
+}
+
+.filter-form {
+    display: flex;
+    gap: var(--spacing-md);
+    align-items: center;
+}
+
+.filter-form select,
+.search-input {
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: 2px solid var(--gray-medium);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+}
+
+.search-input {
+    min-width: 250px;
+}
+
+.applications-section {
+    background: var(--white);
+    padding: var(--spacing-xl);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+}
+
+.applications-table {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+}
+
+.application-row {
+    display: grid;
+    grid-template-columns: 3fr auto auto;
+    gap: var(--spacing-lg);
+    padding: var(--spacing-lg);
+    background: var(--background);
+    border-radius: var(--radius-md);
+    align-items: start;
+    border-left: 4px solid var(--gray-medium);
+}
+
+.application-row.status-pending {
+    border-left-color: var(--warning);
+}
+
+.application-row.status-approved {
+    border-left-color: var(--success);
+}
+
+.application-row.status-rejected {
+    border-left-color: var(--danger);
+}
+
+.application-row.status-completed {
+    border-left-color: var(--accent-color);
+}
+
+.application-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: var(--spacing-lg);
+}
+
+.applicant-column h3,
+.pet-column h4 {
+    margin-bottom: var(--spacing-xs);
+    color: var(--text-dark);
+}
+
+.application-email,
+.application-phone,
+.application-date {
+    margin: var(--spacing-xs) 0;
+    color: var(--text-light);
+    font-size: var(--font-size-sm);
+}
+
+.pet-column h4 {
+    color: var(--primary-color);
+}
+
+.adoption-fee {
+    color: var(--accent-color);
+    font-weight: 600;
+}
+
+.details-column p {
+    margin: var(--spacing-xs) 0;
+    font-size: var(--font-size-sm);
+}
+
+.special-needs {
+    color: var(--warning);
+    font-weight: 600;
+}
+
+.status-column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.status-select {
+    padding: var(--spacing-sm);
+    border: 2px solid var(--gray-medium);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.status-select.status-pending {
+    background: var(--warning);
+    color: var(--text-dark);
+}
+
+.status-select.status-approved {
+    background: var(--success);
+    color: var(--white);
+}
+
+.status-select.status-rejected {
+    background: var(--danger);
+    color: var(--white);
+}
+
+.status-select.status-completed {
+    background: var(--accent-color);
+    color: var(--white);
+}
+
+.review-date {
+    font-size: var(--font-size-xs);
+    color: var(--text-light);
+}
+
+.actions-column {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    margin-top: var(--spacing-xl);
+}
+
+.pagination {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+}
+
+.pagination-btn {
+    padding: var(--spacing-sm) var(--spacing-lg);
+    background: var(--accent-color);
+    color: var(--white);
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: var(--transition);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.pagination-btn:hover {
+    background: var(--primary-color);
+    transform: translateY(-2px);
+}
+
+.page-info {
+    padding: var(--spacing-sm) var(--spacing-lg);
+    color: var(--text-light);
+    font-weight: 500;
+}
+
+.no-applications {
+    text-align: center;
+    padding: var(--spacing-3xl);
+    color: var(--text-light);
+}
+
+.lead {
+    font-size: var(--font-size-xl);
+    opacity: 0.9;
+}
+</style>
+{% endblock %}

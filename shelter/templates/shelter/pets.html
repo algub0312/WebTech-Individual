@@ -1,0 +1,217 @@
+{% extends 'shelter/base.html' %}
+{% load static %}
+
+{% block title %}Find a Pet - PawHaven Pet Shelter{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'shelter/js/search.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="pets-hero">
+    <div class="container">
+        <div class="hero-content">
+            <h1>Find Your Perfect Companion</h1>
+            <p>Browse our available pets and find the one that's perfect for your family. Each pet has been lovingly cared for and is ready for their forever home.</p>
+            
+            <!-- Quick Search Bar -->
+            <div class="quick-search">
+                <form method="get" action="{% url 'pets' %}">
+                    <input type="text" name="search" id="pet-search" 
+                           placeholder="Search by name or breed..." 
+                           class="search-input"
+                           value="{{ request.GET.search }}">
+                    <button type="submit" class="search-btn">
+                        🔍 Search
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Filters and Results Section -->
+<section class="pets-content">
+    <div class="container">
+        <div class="pets-layout">
+            <!-- Sidebar Filters -->
+            <aside class="filters-sidebar">
+                <div class="filters-container">
+                    <h3>Filter Pets</h3>
+                    
+                    <form method="get" action="{% url 'pets' %}" id="filter-form">
+                        <!-- Pet Type Filter -->
+                        <div class="filter-group">
+                            <h4>Pet Type</h4>
+                            <div class="filter-options">
+                                <label class="filter-option">
+                                    <input type="radio" name="type" value="all" 
+                                           {% if not request.GET.type or request.GET.type == 'all' %}checked{% endif %}
+                                           onchange="this.form.submit()">
+                                    All Pets
+                                </label>
+                                <label class="filter-option">
+                                    <input type="radio" name="type" value="dog"
+                                           {% if request.GET.type == 'dog' %}checked{% endif %}
+                                           onchange="this.form.submit()">
+                                    🐕 Dogs
+                                </label>
+                                <label class="filter-option">
+                                    <input type="radio" name="type" value="cat"
+                                           {% if request.GET.type == 'cat' %}checked{% endif %}
+                                           onchange="this.form.submit()">
+                                    🐱 Cats
+                                </label>
+                                <label class="filter-option">
+                                    <input type="radio" name="type" value="rabbit"
+                                           {% if request.GET.type == 'rabbit' %}checked{% endif %}
+                                           onchange="this.form.submit()">
+                                    🐰 Rabbits
+                                </label>
+                                <label class="filter-option">
+                                    <input type="radio" name="type" value="bird"
+                                           {% if request.GET.type == 'bird' %}checked{% endif %}
+                                           onchange="this.form.submit()">
+                                    🐦 Birds
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Size Filter -->
+                        <div class="filter-group">
+                            <h4>Size</h4>
+                            <div class="filter-options">
+                                <label class="filter-option">
+                                    <input type="checkbox" name="size" value="Small"
+                                           {% if 'Small' in request.GET.getlist.size %}checked{% endif %}>
+                                    Small
+                                </label>
+                                <label class="filter-option">
+                                    <input type="checkbox" name="size" value="Medium"
+                                           {% if 'Medium' in request.GET.getlist.size %}checked{% endif %}>
+                                    Medium
+                                </label>
+                                <label class="filter-option">
+                                    <input type="checkbox" name="size" value="Large"
+                                           {% if 'Large' in request.GET.getlist.size %}checked{% endif %}>
+                                    Large
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Special Needs Filter -->
+                        <div class="filter-group">
+                            <h4>Special Considerations</h4>
+                            <div class="filter-options">
+                                <label class="filter-option">
+                                    <input type="checkbox" name="specialNeeds" value="true"
+                                           {% if request.GET.specialNeeds %}checked{% endif %}
+                                           >
+                                    Special Needs
+                                </label>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary apply-filters">
+                            Apply Filters
+                        </button>
+
+                        <!-- Clear Filters Button -->
+                        <a href="{% url 'pets' %}" class="btn btn-outline clear-filters">
+                            Clear All Filters
+                        </a>
+                    </form>
+                </div>
+            </aside>
+
+            <!-- Main Pet Results -->
+            <div class="pets-main">
+                <!-- Results Header -->
+                <div class="results-header">
+                    <div class="results-info">
+                        <h2>Available Pets</h2>
+                        <p class="results-count">Showing {{ total_pets }} pet{% if total_pets != 1 %}s{% endif %}</p>
+                    </div>
+                    
+                    <div class="sort-options">
+                        <label for="sort-select">Sort by:</label>
+                        <form method="get" action="{% url 'pets' %}" style="display: inline;">
+                            {% for key, value in request.GET.items %}
+                                {% if key != 'sort' %}
+                                    <input type="hidden" name="{{ key }}" value="{{ value }}">
+                                {% endif %}
+                            {% endfor %}
+                            <select name="sort" id="sort-select" class="form-select" onchange="this.form.submit()">
+                                <option value="newest" {% if request.GET.sort == 'newest' or not request.GET.sort %}selected{% endif %}>Newest Arrivals</option>
+                                <option value="oldest" {% if request.GET.sort == 'oldest' %}selected{% endif %}>Longest at Shelter</option>
+                                <option value="name" {% if request.GET.sort == 'name' %}selected{% endif %}>Name (A-Z)</option>
+                            </select>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Pet Cards Grid -->
+                <div class="pets-grid" id="pets-grid">
+                    {% for pet in pets %}
+                    <article class="pet-card">
+                        <div class="pet-image">
+                            {% if pet.main_image %}
+                                <img src="{{ pet.main_image.url }}" alt="{{ pet.name }} - {{ pet.breed }}" loading="lazy">
+                            {% else %}
+                                <img src="{% static 'shelter/images/pets/placeholder.jpg' %}" alt="{{ pet.name }} - {{ pet.breed }}" loading="lazy">
+                            {% endif %}
+                            {% if pet.get_badge %}
+                            <div class="pet-badge">{{ pet.get_badge }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="pet-info">
+                            <h3 class="pet-name">{{ pet.name }}</h3>
+                            <p class="pet-breed">{{ pet.breed }}</p>
+                            <p class="pet-age">{{ pet.age }}</p>
+                            {% if pet.personality %}
+                            <div class="pet-traits">
+                                {% for trait in pet.personality|slice:":3" %}
+                                <span class="trait-badge">{{ trait }}</span>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                            <a href="{% url 'pet_detail' pet.pk pet.slug %}" class="btn btn-small">Meet {{ pet.name }}</a>
+                        </div>
+                    </article>
+                    {% empty %}
+                    <div class="no-results">
+                        <div class="no-results-content">
+                            <h3>No pets found matching your criteria</h3>
+                            <p>Try adjusting your filters or search terms to find more pets.</p>
+                            <a href="{% url 'pets' %}" class="btn btn-primary">Reset Filters</a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Pagination -->
+                {% if is_paginated %}
+                <div class="pagination-container">
+                    <div class="pagination">
+                        {% if page_obj.has_previous %}
+                        <a href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" 
+                           class="pagination-btn">← Previous</a>
+                        {% endif %}
+                        
+                        <span class="page-info">
+                            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                        </span>
+                        
+                        {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" 
+                           class="pagination-btn">Next →</a>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

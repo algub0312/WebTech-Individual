@@ -1,0 +1,133 @@
+{% extends 'shelter/base.html' %}
+{% load static %}
+
+{% block title %}Adoption Process - PawHaven Pet Shelter{% endblock %}
+
+{% block content %}
+<section class="adoption-hero">
+    <div class="container">
+        <h1>Adoption Process</h1>
+        <p class="lead">Start your journey to finding a new family member</p>
+    </div>
+</section>
+
+<section class="adoption-steps">
+    <div class="container">
+        <h2 style="text-align: center; margin-bottom: var(--spacing-3xl);">How to Adopt</h2>
+        
+        <div class="steps-grid">
+            <div class="step-card">
+                <div class="step-number">1</div>
+                <h3>Browse Our Pets</h3>
+                <p>Visit our pets page to see all available animals. Each profile includes photos, personality traits, and important information.</p>
+            </div>
+
+            <div class="step-card">
+                <div class="step-number">2</div>
+                <h3>Submit Application</h3>
+                <p>Found your perfect match? Fill out our adoption application form. We'll review it within 24-48 hours.</p>
+            </div>
+
+            <div class="step-card">
+                <div class="step-number">3</div>
+                <h3>Meet & Greet</h3>
+                <p>Once approved, schedule a visit to meet your potential new family member in person at our shelter.</p>
+            </div>
+
+            <div class="step-card">
+                <div class="step-number">4</div>
+                <h3>Take Them Home</h3>
+                <p>Complete the adoption paperwork, pay the adoption fee, and welcome your new pet home!</p>
+            </div>
+        </div>
+
+        <div class="adoption-requirements">
+            <h2>Adoption Requirements</h2>
+            <ul>
+                <li>Must be 21 years of age or older</li>
+                <li>Valid photo ID required</li>
+                <li>If renting, landlord approval for pets is necessary</li>
+                <li>All household members should meet the pet</li>
+                <li>Veterinary reference (if you have/had pets previously)</li>
+            </ul>
+        </div>
+
+        <div style="text-align: center; margin-top: var(--spacing-3xl);">
+            <a href="{% url 'pets' %}" class="btn btn-primary btn-large">Start Browsing Pets</a>
+        </div>
+    </div>
+</section>
+
+<style>
+.adoption-hero {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+    color: var(--white);
+    padding: var(--spacing-3xl) 0;
+    text-align: center;
+}
+
+.adoption-steps {
+    padding: var(--spacing-3xl) 0;
+}
+
+.steps-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--spacing-xl);
+    margin-bottom: var(--spacing-3xl);
+}
+
+.step-card {
+    background: var(--white);
+    padding: var(--spacing-2xl);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    text-align: center;
+    transition: var(--transition);
+}
+
+.step-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+}
+
+.step-number {
+    width: 60px;
+    height: 60px;
+    background: var(--primary-color);
+    color: var(--white);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--font-size-2xl);
+    font-weight: 700;
+    margin: 0 auto var(--spacing-lg);
+}
+
+.adoption-requirements {
+    background: var(--white);
+    padding: var(--spacing-2xl);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+}
+
+.adoption-requirements h2 {
+    color: var(--primary-color);
+    margin-bottom: var(--spacing-lg);
+}
+
+.adoption-requirements ul {
+    list-style-position: inside;
+}
+
+.adoption-requirements li {
+    padding: var(--spacing-sm) 0;
+}
+
+.lead {
+    font-size: var(--font-size-xl);
+    opacity: 0.9;
+}
+</style>
+{% endblock %}

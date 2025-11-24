@@ -1,0 +1,348 @@
+{% extends 'shelter/base.html' %}
+{% load static %}
+
+{% block title %}My Account - PawHaven Pet Shelter{% endblock %}
+
+{% block content %}
+<section class="account-hero">
+    <div class="container">
+        <h1>Welcome, {{ user.first_name|default:user.username }}!</h1>
+        <p class="lead">Manage your account and adoption applications</p>
+    </div>
+</section>
+
+<section class="account-content">
+    <div class="container">
+        <div class="account-layout">
+            <!-- Sidebar Navigation -->
+            <aside class="account-sidebar">
+                <nav class="account-nav">
+                    <a href="{% url 'account' %}" class="nav-item active">
+                        <span class="nav-icon">👤</span>
+                        Profile
+                    </a>
+                    <a href="{% url 'user_applications' %}" class="nav-item">
+                        <span class="nav-icon">📝</span>
+                        My Applications
+                    </a>
+                    <a href="{% url 'edit_profile' %}" class="nav-item">
+                        <span class="nav-icon">✏️</span>
+                        Edit Profile
+                    </a>
+                    <a href="{% url 'pets' %}" class="nav-item">
+                        <span class="nav-icon">🐾</span>
+                        Browse Pets
+                    </a>
+                    <a href="{% url 'logout' %}" class="nav-item">
+                        <span class="nav-icon">🚪</span>
+                        Logout
+                    </a>
+                </nav>
+            </aside>
+
+            <!-- Main Content -->
+            <div class="account-main">
+                <div class="profile-section">
+                    <div class="section-header-with-button">
+                        <h2>Profile Information</h2>
+                        <a href="{% url 'edit_profile' %}" class="btn btn-outline btn-small">Edit Profile</a>
+                    </div>
+                    <div class="profile-info">
+                        <div class="info-item">
+                            <strong>Username:</strong> {{ user.username }}
+                        </div>
+                        <div class="info-item">
+                            <strong>Email:</strong> {{ user.email|default:"No email set" }}
+                        </div>
+                        {% if user.first_name %}
+                        <div class="info-item">
+                            <strong>First Name:</strong> {{ user.first_name }}
+                        </div>
+                        {% endif %}
+                        {% if user.last_name %}
+                        <div class="info-item">
+                            <strong>Last Name:</strong> {{ user.last_name }}
+                        </div>
+                        {% endif %}
+                        <div class="info-item">
+                            <strong>Member Since:</strong> {{ user.date_joined|date:"F d, Y" }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="applications-summary">
+                    <h2>Recent Applications</h2>
+                    {% if recent_applications %}
+                    <div class="applications-list">
+                        {% for application in recent_applications %}
+                        <div class="application-card">
+                            <div class="application-pet">
+                                {% if application.pet.main_image %}
+                                <img src="{{ application.pet.main_image.url }}" alt="{{ application.pet.name }}">
+                                {% else %}
+                                <img src="{% static 'shelter/images/pets/placeholder.jpg' %}" alt="{{ application.pet.name }}">
+                                {% endif %}
+                            </div>
+                            <div class="application-details">
+                                <h3>{{ application.pet.name }}</h3>
+                                <p class="application-date">Submitted: {{ application.submitted_at|date:"F d, Y" }}</p>
+                                <span class="status-badge status-{{ application.status }}">{{ application.get_status_display }}</span>
+                            </div>
+                            <div class="application-actions">
+                                <a href="{% url 'pet_detail' application.pet.pk application.pet.slug %}" class="btn btn-small btn-outline">View Pet</a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <a href="{% url 'user_applications' %}" class="btn btn-outline">View All Applications</a>
+                    {% else %}
+                    <div class="no-applications">
+                        <p>You haven't submitted any adoption applications yet.</p>
+                        <a href="{% url 'pets' %}" class="btn btn-primary">Start Browsing Pets</a>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="quick-actions">
+                    <h2>Quick Actions</h2>
+                    <div class="actions-grid">
+                        <a href="{% url 'pets' %}" class="action-card">
+                            <div class="action-icon">🐕</div>
+                            <h3>Browse Pets</h3>
+                            <p>Find your perfect companion</p>
+                        </a>
+                        <a href="{% url 'adoption_process' %}" class="action-card">
+                            <div class="action-icon">📋</div>
+                            <h3>Adoption Process</h3>
+                            <p>Learn about adoption</p>
+                        </a>
+                        <a href="{% url 'contact' %}" class="action-card">
+                            <div class="action-icon">📞</div>
+                            <h3>Contact Us</h3>
+                            <p>Get help or ask questions</p>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+.account-hero {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+    color: var(--white);
+    padding: var(--spacing-3xl) 0;
+    text-align: center;
+}
+
+.account-content {
+    padding: var(--spacing-3xl) 0;
+}
+
+.account-layout {
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    gap: var(--spacing-3xl);
+}
+
+.account-sidebar {
+    position: sticky;
+    top: 100px;
+    height: fit-content;
+}
+
+.account-nav {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    box-shadow: var(--shadow-md);
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+    color: var(--text-dark);
+    text-decoration: none;
+    border-radius: var(--radius-md);
+    transition: var(--transition);
+    margin-bottom: var(--spacing-sm);
+}
+
+.nav-item:hover {
+    background: var(--background);
+}
+
+.nav-item.active {
+    background: var(--primary-color);
+    color: var(--white);
+}
+
+.nav-icon {
+    font-size: var(--font-size-xl);
+}
+
+.account-main {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2xl);
+}
+
+.profile-section,
+.applications-summary,
+.quick-actions {
+    background: var(--white);
+    padding: var(--spacing-2xl);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+}
+
+.section-header-with-button {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-xl);
+}
+
+.section-header-with-button h2 {
+    margin-bottom: 0;
+}
+
+.profile-section h2,
+.applications-summary h2,
+.quick-actions h2 {
+    color: var(--primary-color);
+    margin-bottom: var(--spacing-xl);
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 2px solid var(--primary-color);
+}
+
+.profile-info {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-lg);
+}
+
+.info-item {
+    padding: var(--spacing-md);
+    background: var(--background);
+    border-radius: var(--radius-md);
+}
+
+.applications-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
+}
+
+.application-card {
+    display: grid;
+    grid-template-columns: 100px 1fr auto;
+    gap: var(--spacing-lg);
+    padding: var(--spacing-lg);
+    background: var(--background);
+    border-radius: var(--radius-md);
+    align-items: center;
+}
+
+.application-pet img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: var(--radius-md);
+}
+
+.application-details h3 {
+    margin-bottom: var(--spacing-xs);
+}
+
+.application-date {
+    color: var(--text-light);
+    font-size: var(--font-size-sm);
+    margin-bottom: var(--spacing-sm);
+}
+
+.status-badge {
+    display: inline-block;
+    padding: var(--spacing-xs) var(--spacing-md);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+}
+
+.status-pending {
+    background: var(--warning);
+    color: var(--text-dark);
+}
+
+.status-approved {
+    background: var(--success);
+    color: var(--white);
+}
+
+.status-rejected {
+    background: var(--danger);
+    color: var(--white);
+}
+
+.status-completed {
+    background: var(--accent-color);
+    color: var(--white);
+}
+
+.no-applications {
+    text-align: center;
+    padding: var(--spacing-3xl);
+}
+
+.no-applications p {
+    margin-bottom: var(--spacing-xl);
+    color: var(--text-light);
+}
+
+.actions-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-lg);
+}
+
+.action-card {
+    padding: var(--spacing-xl);
+    background: var(--background);
+    border-radius: var(--radius-md);
+    text-align: center;
+    transition: var(--transition);
+    text-decoration: none;
+    color: var(--text-dark);
+}
+
+.action-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-md);
+    background: var(--primary-color);
+    color: var(--white);
+}
+
+.action-icon {
+    font-size: 3rem;
+    margin-bottom: var(--spacing-md);
+}
+
+.action-card h3 {
+    margin-bottom: var(--spacing-sm);
+}
+
+.action-card p {
+    font-size: var(--font-size-sm);
+    margin: 0;
+}
+
+.lead {
+    font-size: var(--font-size-xl);
+    opacity: 0.9;
+}
+</style>
+{% endblock %}

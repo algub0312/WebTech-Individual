@@ -1,0 +1,204 @@
+{% extends 'shelter/base.html' %}
+{% load static %}
+
+{% block title %}Login - PawHaven Pet Shelter{% endblock %}
+
+{% block content %}
+<section class="auth-hero">
+    <div class="container">
+        <h1>Welcome Back!</h1>
+        <p class="lead">Log in to continue your adoption journey</p>
+    </div>
+</section>
+
+<section class="auth-content">
+    <div class="container">
+        <div class="auth-layout">
+            <div class="auth-form-section">
+                <h2>Login</h2>
+                <form method="post" class="auth-form">
+                    {% csrf_token %}
+                    
+                    {% if form.errors %}
+                    <div class="form-errors">
+                        <p class="error">Invalid username or password. Please try again.</p>
+                    </div>
+                    {% endif %}
+
+                    <div class="form-group">
+                        <label for="id_username">Username</label>
+                        {{ form.username }}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="id_password">Password</label>
+                        {{ form.password }}
+                    </div>
+
+                    <div class="form-remember">
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="remember" id="remember">
+                            Remember me
+                        </label>
+                    </div>
+
+                    <input type="hidden" name="next" value="{{ next }}">
+
+                    <button type="submit" class="btn btn-primary btn-large">Log In</button>
+                </form>
+
+                <p class="auth-switch">
+                    Don't have an account? <a href="{% url 'register' %}">Register here</a>
+                </p>
+            </div>
+
+            <aside class="auth-sidebar">
+                <div class="info-box">
+                    <h3>Your Account Benefits</h3>
+                    <ul>
+                        <li>✓ Track adoption applications</li>
+                        <li>✓ Save favorite pets</li>
+                        <li>✓ Faster future applications</li>
+                        <li>✓ Receive pet updates</li>
+                    </ul>
+                </div>
+
+                <div class="info-box">
+                    <h3>Need Help?</h3>
+                    <p>Contact us if you're having trouble accessing your account:</p>
+                    <p>📞 (555) 123-PETS</p>
+                    <p>✉️ info@pawhaven.com</p>
+                </div>
+            </aside>
+        </div>
+    </div>
+</section>
+
+<style>
+.auth-hero {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+    color: var(--white);
+    padding: var(--spacing-3xl) 0;
+    text-align: center;
+}
+
+.auth-content {
+    padding: var(--spacing-3xl) 0;
+}
+
+.auth-layout {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: var(--spacing-3xl);
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.auth-form-section {
+    background: var(--white);
+    padding: var(--spacing-2xl);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+}
+
+.auth-form h2 {
+    color: var(--primary-color);
+    margin-bottom: var(--spacing-xl);
+}
+
+.form-errors {
+    background: #fee;
+    border: 2px solid var(--danger);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+}
+
+.form-errors .error {
+    color: var(--danger);
+    margin: var(--spacing-xs) 0;
+}
+
+.form-group {
+    margin-bottom: var(--spacing-lg);
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: var(--spacing-sm);
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.form-group input {
+    width: 100%;
+    padding: var(--spacing-md);
+    border: 2px solid var(--gray-medium);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-base);
+    font-family: inherit;
+    transition: var(--transition);
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+.form-remember {
+    margin-bottom: var(--spacing-lg);
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    cursor: pointer;
+    font-weight: normal;
+}
+
+.checkbox-label input[type="checkbox"] {
+    transform: scale(1.2);
+}
+
+.auth-switch {
+    text-align: center;
+    margin-top: var(--spacing-xl);
+    padding-top: var(--spacing-xl);
+    border-top: 1px solid var(--gray-light);
+}
+
+.auth-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+}
+
+.info-box {
+    background: var(--white);
+    padding: var(--spacing-xl);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+}
+
+.info-box h3 {
+    color: var(--primary-color);
+    margin-bottom: var(--spacing-lg);
+}
+
+.info-box ul {
+    list-style: none;
+    padding: 0;
+}
+
+.info-box li {
+    padding: var(--spacing-sm) 0;
+    color: var(--text-dark);
+}
+
+.lead {
+    font-size: var(--font-size-xl);
+    opacity: 0.9;
+}
+</style>
+{% endblock %}

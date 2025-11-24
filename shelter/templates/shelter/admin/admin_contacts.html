@@ -1,0 +1,479 @@
+{% extends 'shelter/base.html' %}
+{% load static %}
+
+{% block title %}Contact Messages - Admin Dashboard{% endblock %}
+
+{% block content %}
+<section class="admin-hero">
+    <div class="container">
+        <h1>Contact Messages</h1>
+        <p class="lead">Manage and respond to contact form submissions</p>
+    </div>
+</section>
+
+<section class="admin-content">
+    <div class="container">
+        <div class="admin-layout">
+            <!-- Sidebar Navigation -->
+            <aside class="admin-sidebar">
+                <nav class="admin-nav">
+                    <div class="admin-profile-header">
+                        <h4>{{ user.first_name|default:user.username }}</h4>
+                        <p class="admin-role">Administrator</p>
+                    </div>
+                    <a href="{% url 'admin_dashboard' %}" class="nav-item">
+                        <span class="nav-icon">📊</span>
+                        Dashboard
+                    </a>
+                    <a href="{% url 'admin_applications' %}" class="nav-item">
+                        <span class="nav-icon">📝</span>
+                        All Applications
+                    </a>
+                    <a href="{% url 'admin_pets' %}" class="nav-item">
+                        <span class="nav-icon">🐾</span>
+                        Manage Pets
+                    </a>
+                    <a href="{% url 'admin_contacts' %}" class="nav-item active">
+                        <span class="nav-icon">📞</span>
+                        Contact Messages
+                    </a>
+                    <a href="/admin/" class="nav-item">
+                        <span class="nav-icon">⚙️</span>
+                        Django Admin
+                    </a>
+                    <div class="nav-divider"></div>
+                    <a href="{% url 'pets' %}" class="nav-item">
+                        <span class="nav-icon">🏠</span>
+                        Public Site
+                    </a>
+                    <a href="{% url 'logout' %}" class="nav-item">
+                        <span class="nav-icon">🚪</span>
+                        Logout
+                    </a>
+                </nav>
+            </aside>
+
+            <!-- Main Content -->
+            <div class="admin-main">
+                <!-- Filters and Search -->
+                <div class="filters-section">
+                    <div class="section-header">
+                        <h2>All Messages ({{ total_contacts }})</h2>
+                        <div class="filter-controls">
+                            <form method="get" class="filter-form">
+                                <select name="read" onchange="this.form.submit()">
+                                    <option value="">All Messages</option>
+                                    <option value="unread" {% if request.GET.read == 'unread' %}selected{% endif %}>Unread</option>
+                                    <option value="read" {% if request.GET.read == 'read' %}selected{% endif %}>Read</option>
+                                </select>
+                                <input type="text" name="search" placeholder="Search by name, email, or subject..." 
+                                       value="{{ request.GET.search }}" class="search-input">
+                                <button type="submit" class="btn btn-small btn-primary">Filter</button>
+                                <a href="{% url 'admin_contacts' %}" class="btn btn-small btn-outline">Clear</a>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Messages Table -->
+                <div class="contacts-section">
+                    {% if contacts %}
+                    <div class="contacts-table">
+                        {% for contact in contacts %}
+                        <div class="contact-row {% if not contact.is_read %}unread{% endif %}">
+                            <div class="contact-info">
+                                <div class="sender-info">
+                                    <h3>{{ contact.name }}</h3>
+                                    <p class="contact-email">
+                                        <a href="mailto:{{ contact.email }}">{{ contact.email }}</a>
+                                    </p>
+                                    {% if contact.phone %}
+                                    <p class="contact-phone">
+                                        <a href="tel:{{ contact.phone }}">📞 {{ contact.phone }}</a>
+                                    </p>
+                                    {% endif %}
+                                    <p class="contact-date">{{ contact.created_at|date:"M d, Y g:i A" }}</p>
+                                </div>
+                                
+                                <div class="message-preview">
+                                    <h4>{{ contact.subject }}</h4>
+                                    <p class="message-text">{{ contact.message|truncatewords:20 }}</p>
+                                </div>
+                            </div>
+
+                            <div class="contact-status">
+                                {% if not contact.is_read %}
+                                <span class="status-badge status-new">New</span>
+                                {% elif not contact.is_responded %}
+                                <span class="status-badge status-read">Read</span>
+                                {% else %}
+                                <span class="status-badge status-responded">Responded</span>
+                                {% endif %}
+                            </div>
+
+                            <div class="contact-actions">
+                                <a href="{% url 'admin_contact_detail' contact.id %}" class="btn btn-small btn-primary">
+                                    {% if not contact.is_read %}View{% else %}Details{% endif %}
+                                </a>
+                                <a href="mailto:{{ contact.email }}?subject=Re: {{ contact.subject }}" class="btn btn-small btn-secondary">Reply</a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Pagination -->
+                    {% if is_paginated %}
+                    <div class="pagination-container">
+                        <div class="pagination">
+                            {% if page_obj.has_previous %}
+                            <a href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" 
+                               class="pagination-btn">← Previous</a>
+                            {% endif %}
+                            
+                            <span class="page-info">
+                                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                            </span>
+                            
+                            {% if page_obj.has_next %}
+                            <a href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" 
+                               class="pagination-btn">Next →</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% else %}
+                    <div class="no-contacts">
+                        <h3>No messages found</h3>
+                        <p>No contact messages match your current filters.</p>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Quick Stats -->
+                <div class="contacts-stats">
+                    <h3>Message Statistics</h3>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-number">{{ contacts|length }}</div>
+                            <div class="stat-label">Showing</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">{{ total_contacts }}</div>
+                            <div class="stat-label">Total Messages</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+.admin-hero {
+    background: linear-gradient(135deg, var(--accent-color) 0%, var(--primary-color) 100%);
+    color: var(--white);
+    padding: var(--spacing-2xl) 0;
+    text-align: center;
+}
+
+.admin-content {
+    padding: var(--spacing-3xl) 0;
+}
+
+.admin-layout {
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    gap: var(--spacing-3xl);
+}
+
+.admin-sidebar {
+    position: sticky;
+    top: 100px;
+    height: fit-content;
+}
+
+.admin-nav {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    box-shadow: var(--shadow-md);
+}
+
+.admin-profile-header {
+    text-align: center;
+    padding: var(--spacing-lg) 0;
+    border-bottom: 2px solid var(--background);
+    margin-bottom: var(--spacing-lg);
+}
+
+.admin-profile-header h4 {
+    color: var(--accent-color);
+    margin-bottom: var(--spacing-xs);
+}
+
+.admin-role {
+    color: var(--text-light);
+    font-size: var(--font-size-sm);
+    margin: 0;
+}
+
+.nav-divider {
+    height: 1px;
+    background: var(--background);
+    margin: var(--spacing-md) 0;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+    color: var(--text-dark);
+    text-decoration: none;
+    border-radius: var(--radius-md);
+    transition: var(--transition);
+    margin-bottom: var(--spacing-sm);
+}
+
+.nav-item:hover {
+    background: var(--background);
+}
+
+.nav-item.active {
+    background: var(--accent-color);
+    color: var(--white);
+}
+
+.nav-icon {
+    font-size: var(--font-size-xl);
+}
+
+.admin-main {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xl);
+}
+
+.filters-section,
+.contacts-section,
+.contacts-stats {
+    background: var(--white);
+    padding: var(--spacing-xl);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+}
+
+.section-header h2 {
+    color: var(--accent-color);
+    margin-bottom: 0;
+}
+
+.filter-form {
+    display: flex;
+    gap: var(--spacing-md);
+    align-items: center;
+}
+
+.filter-form select,
+.search-input {
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: 2px solid var(--gray-medium);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+}
+
+.search-input {
+    min-width: 300px;
+}
+
+.contacts-table {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+}
+
+.contact-row {
+    display: grid;
+    grid-template-columns: 2fr auto auto;
+    gap: var(--spacing-lg);
+    padding: var(--spacing-lg);
+    background: var(--background);
+    border-radius: var(--radius-md);
+    align-items: start;
+    border-left: 4px solid var(--gray-medium);
+    transition: var(--transition);
+}
+
+.contact-row.unread {
+    border-left-color: var(--primary-color);
+    background: #f8f9ff;
+}
+
+.contact-row:hover {
+    background: var(--gray-light);
+}
+
+.contact-info {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: var(--spacing-lg);
+}
+
+.sender-info h3 {
+    margin-bottom: var(--spacing-xs);
+    color: var(--text-dark);
+}
+
+.contact-email,
+.contact-phone,
+.contact-date {
+    margin: var(--spacing-xs) 0;
+    font-size: var(--font-size-sm);
+}
+
+.contact-email a,
+.contact-phone a {
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+.contact-email a:hover,
+.contact-phone a:hover {
+    text-decoration: underline;
+}
+
+.contact-date {
+    color: var(--text-light);
+}
+
+.message-preview h4 {
+    color: var(--accent-color);
+    margin-bottom: var(--spacing-sm);
+}
+
+.message-text {
+    color: var(--text-light);
+    line-height: 1.5;
+    margin: 0;
+}
+
+.contact-status {
+    display: flex;
+    align-items: center;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: var(--spacing-xs) var(--spacing-md);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.status-new {
+    background: var(--primary-color);
+    color: var(--white);
+}
+
+.status-read {
+    background: var(--warning);
+    color: var(--text-dark);
+}
+
+.status-responded {
+    background: var(--success);
+    color: var(--white);
+}
+
+.contact-actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    margin-top: var(--spacing-xl);
+}
+
+.pagination {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+}
+
+.pagination-btn {
+    padding: var(--spacing-sm) var(--spacing-lg);
+    background: var(--accent-color);
+    color: var(--white);
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: var(--transition);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.pagination-btn:hover {
+    background: var(--primary-color);
+    transform: translateY(-2px);
+}
+
+.page-info {
+    padding: var(--spacing-sm) var(--spacing-lg);
+    color: var(--text-light);
+    font-weight: 500;
+}
+
+.no-contacts {
+    text-align: center;
+    padding: var(--spacing-3xl);
+    color: var(--text-light);
+}
+
+.contacts-stats h3 {
+    color: var(--accent-color);
+    margin-bottom: var(--spacing-lg);
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-md);
+}
+
+.stat-item {
+    text-align: center;
+    padding: var(--spacing-md);
+    background: var(--background);
+    border-radius: var(--radius-md);
+}
+
+.stat-number {
+    font-size: var(--font-size-2xl);
+    font-weight: 700;
+    color: var(--accent-color);
+}
+
+.stat-label {
+    color: var(--text-light);
+    font-size: var(--font-size-sm);
+}
+
+.lead {
+    font-size: var(--font-size-xl);
+    opacity: 0.9;
+}
+</style>
+{% endblock %}

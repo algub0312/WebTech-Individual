@@ -1,0 +1,278 @@
+{% extends 'shelter/base.html' %}
+{% load static %}
+
+{% block title %}Edit Profile - PawHaven Pet Shelter{% endblock %}
+
+{% block content %}
+<section class="account-hero">
+    <div class="container">
+        <h1>Edit Your Profile</h1>
+        <p class="lead">Update your account information</p>
+    </div>
+</section>
+
+<section class="account-content">
+    <div class="container">
+        <div class="account-layout">
+            <!-- Sidebar Navigation -->
+            <aside class="account-sidebar">
+                <nav class="account-nav">
+                    <a href="{% url 'account' %}" class="nav-item">
+                        <span class="nav-icon">👤</span>
+                        Profile
+                    </a>
+                    <a href="{% url 'user_applications' %}" class="nav-item">
+                        <span class="nav-icon">📝</span>
+                        My Applications
+                    </a>
+                    <a href="{% url 'edit_profile' %}" class="nav-item active">
+                        <span class="nav-icon">✏️</span>
+                        Edit Profile
+                    </a>
+                    <a href="{% url 'pets' %}" class="nav-item">
+                        <span class="nav-icon">🐾</span>
+                        Browse Pets
+                    </a>
+                    <a href="{% url 'logout' %}" class="nav-item">
+                        <span class="nav-icon">🚪</span>
+                        Logout
+                    </a>
+                </nav>
+            </aside>
+
+            <!-- Main Content -->
+            <div class="account-main">
+                <div class="profile-edit-section">
+                    <h2>Update Your Information</h2>
+                    
+                    <form method="post" class="profile-form">
+                        {% csrf_token %}
+                        
+                        {% if form.errors %}
+                        <div class="form-errors">
+                            {% for field in form %}
+                                {% for error in field.errors %}
+                                    <p class="error">{{ field.label }}: {{ error }}</p>
+                                {% endfor %}
+                            {% endfor %}
+                            {% for error in form.non_field_errors %}
+                                <p class="error">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+
+                        <div class="form-group">
+                            <label for="{{ form.username.id_for_label }}">Username *</label>
+                            {{ form.username }}
+                            <small class="form-help">Your username cannot be changed if applications are linked to it.</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="{{ form.email.id_for_label }}">Email Address *</label>
+                            {{ form.email }}
+                            <small class="form-help">We use your email to track adoption applications.</small>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="{{ form.first_name.id_for_label }}">First Name</label>
+                                {{ form.first_name }}
+                            </div>
+
+                            <div class="form-group">
+                                <label for="{{ form.last_name.id_for_label }}">Last Name</label>
+                                {{ form.last_name }}
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary btn-large">Save Changes</button>
+                            <a href="{% url 'account' %}" class="btn btn-outline">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="info-section">
+                    <h3>About Your Account</h3>
+                    <div class="info-card">
+                        <p><strong>Account Created:</strong> {{ user.date_joined|date:"F d, Y" }}</p>
+                        <p><strong>Last Login:</strong> {{ user.last_login|date:"F d, Y g:i A" }}</p>
+                    </div>
+                    
+                    <div class="info-card security-note">
+                        <h4>🔒 Security Note</h4>
+                        <p>Keep your email address up to date so we can reach you about your adoption applications.</p>
+                        <p>Your password is encrypted and cannot be viewed by anyone, including our staff.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+.account-hero {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+    color: var(--white);
+    padding: var(--spacing-3xl) 0;
+    text-align: center;
+}
+
+.account-content {
+    padding: var(--spacing-3xl) 0;
+}
+
+.account-layout {
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    gap: var(--spacing-3xl);
+}
+
+.account-sidebar {
+    position: sticky;
+    top: 100px;
+    height: fit-content;
+}
+
+.account-nav {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    box-shadow: var(--shadow-md);
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+    color: var(--text-dark);
+    text-decoration: none;
+    border-radius: var(--radius-md);
+    transition: var(--transition);
+    margin-bottom: var(--spacing-sm);
+}
+
+.nav-item:hover {
+    background: var(--background);
+}
+
+.nav-item.active {
+    background: var(--primary-color);
+    color: var(--white);
+}
+
+.nav-icon {
+    font-size: var(--font-size-xl);
+}
+
+.account-main {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2xl);
+}
+
+.profile-edit-section,
+.info-section {
+    background: var(--white);
+    padding: var(--spacing-2xl);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+}
+
+.profile-edit-section h2,
+.info-section h3 {
+    color: var(--primary-color);
+    margin-bottom: var(--spacing-xl);
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 2px solid var(--primary-color);
+}
+
+.form-errors {
+    background: #fee;
+    border: 2px solid var(--danger);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+}
+
+.form-errors .error {
+    color: var(--danger);
+    margin: var(--spacing-xs) 0;
+}
+
+.form-group {
+    margin-bottom: var(--spacing-lg);
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: var(--spacing-sm);
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: var(--spacing-md);
+    border: 2px solid var(--gray-medium);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-base);
+    font-family: inherit;
+    transition: var(--transition);
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-lg);
+}
+
+.form-help {
+    display: block;
+    margin-top: var(--spacing-xs);
+    color: var(--text-light);
+    font-size: var(--font-size-sm);
+}
+
+.form-actions {
+    display: flex;
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-2xl);
+}
+
+.info-card {
+    padding: var(--spacing-lg);
+    background: var(--background);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--spacing-md);
+}
+
+.info-card p {
+    margin-bottom: var(--spacing-sm);
+}
+
+.security-note {
+    border-left: 4px solid var(--accent-color);
+}
+
+.security-note h4 {
+    color: var(--accent-color);
+    margin-bottom: var(--spacing-md);
+}
+
+.lead {
+    font-size: var(--font-size-xl);
+    opacity: 0.9;
+}
+</style>
+{% endblock %}

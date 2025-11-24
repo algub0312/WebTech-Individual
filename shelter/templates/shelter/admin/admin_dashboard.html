@@ -1,0 +1,429 @@
+{% extends 'shelter/base.html' %}
+{% load static %}
+
+{% block title %}Admin Dashboard - PawHaven Pet Shelter{% endblock %}
+
+{% block content %}
+<section class="admin-hero">
+    <div class="container">
+        <h1>Welcome, {{ user.first_name|default:user.username }}!</h1>
+        <p class="lead">Admin Dashboard - Manage shelter operations</p>
+        <div class="admin-user-info">
+            <span class="admin-badge">🛡️ Administrator</span>
+            <p>Last login: {{ user.last_login|date:"F d, Y g:i A" }}</p>
+        </div>
+    </div>
+</section>
+
+<section class="admin-content">
+    <div class="container">
+        <div class="admin-layout">
+            <!-- Sidebar Navigation -->
+            <aside class="admin-sidebar">
+                <nav class="admin-nav">
+                    <div class="admin-profile-header">
+                        <h4>{{ user.first_name|default:user.username }}</h4>
+                        <p class="admin-role">Administrator</p>
+                    </div>
+                    <a href="{% url 'admin_dashboard' %}" class="nav-item active">
+                        <span class="nav-icon">📊</span>
+                        Dashboard
+                    </a>
+                    <a href="{% url 'admin_applications' %}" class="nav-item">
+                        <span class="nav-icon">📝</span>
+                        All Applications
+                    </a>
+                    <a href="{% url 'admin_pets' %}" class="nav-item">
+                        <span class="nav-icon">🐾</span>
+                        Manage Pets
+                    </a>
+                    <a href="{% url 'admin_contacts' %}" class="nav-item">
+                        <span class="nav-icon">📞</span>
+                        Contact Messages
+                    </a>
+                    <a href="/admin/" class="nav-item">
+                        <span class="nav-icon">⚙️</span>
+                        Django Admin
+                    </a>
+                    <div class="nav-divider"></div>
+                    <a href="{% url 'pets' %}" class="nav-item">
+                        <span class="nav-icon">🏠</span>
+                        Public Site
+                    </a>
+                    <a href="{% url 'logout' %}" class="nav-item">
+                        <span class="nav-icon">🚪</span>
+                        Logout
+                    </a>
+                </nav>
+            </aside>
+
+            <!-- Main Content -->
+            <div class="admin-main">
+                <!-- Stats Overview -->
+                <div class="stats-overview">
+                    <h2>Overview</h2>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number">{{ stats.pending_applications }}</div>
+                            <div class="stat-label">Pending Applications</div>
+                            <div class="stat-icon">⏳</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">{{ stats.available_pets }}</div>
+                            <div class="stat-label">Available Pets</div>
+                            <div class="stat-icon">🐕</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">{{ stats.total_adopted }}</div>
+                            <div class="stat-label">Total Adopted</div>
+                            <div class="stat-icon">❤️</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">{{ stats.unread_messages }}</div>
+                            <div class="stat-label">Unread Messages</div>
+                            <div class="stat-icon">📧</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Applications -->
+                <div class="recent-applications">
+                    <div class="section-header">
+                        <h2>Recent Applications</h2>
+                        <a href="{% url 'admin_applications' %}" class="btn btn-outline btn-small">View All</a>
+                    </div>
+
+                    {% if recent_applications %}
+                    <div class="applications-table">
+                        {% for application in recent_applications %}
+                        <div class="application-row">
+                            <div class="application-info">
+                                <div class="applicant-details">
+                                    <h3>{{ application.first_name }} {{ application.last_name }}</h3>
+                                    <p class="application-email">{{ application.email }}</p>
+                                    <p class="application-date">{{ application.submitted_at|date:"M d, Y g:i A" }}</p>
+                                </div>
+                                <div class="pet-details">
+                                    <h4>{{ application.pet.name }}</h4>
+                                    <p>{{ application.pet.breed }} • {{ application.pet.age }}</p>
+                                </div>
+                            </div>
+
+                            <div class="application-status">
+                                <span class="status-badge status-{{ application.status }}">
+                                    {{ application.get_status_display }}
+                                </span>
+                            </div>
+
+                            <div class="application-actions">
+                                <a href="{% url 'admin_application_detail' application.id %}" class="btn btn-small btn-primary">Review</a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="no-data">
+                        <p>No recent applications</p>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Recent Contact Messages -->
+                <div class="recent-contacts">
+                    <div class="section-header">
+                        <h2>Recent Contact Messages</h2>
+                        <a href="{% url 'admin_contacts' %}" class="btn btn-outline btn-small">View All</a>
+                    </div>
+
+                    {% if recent_contacts %}
+                    <div class="contacts-table">
+                        {% for contact in recent_contacts %}
+                        <div class="contact-row">
+                            <div class="contact-info">
+                                <h3>{{ contact.name }}</h3>
+                                <p class="contact-subject">{{ contact.subject }}</p>
+                                <p class="contact-date">{{ contact.created_at|date:"M d, Y g:i A" }}</p>
+                            </div>
+
+                            <div class="contact-status">
+                                {% if not contact.is_read %}
+                                <span class="status-badge status-new">New</span>
+                                {% elif not contact.is_responded %}
+                                <span class="status-badge status-pending">Read</span>
+                                {% else %}
+                                <span class="status-badge status-completed">Responded</span>
+                                {% endif %}
+                            </div>
+
+                            <div class="contact-actions">
+                                <a href="{% url 'admin_contact_detail' contact.id %}" class="btn btn-small btn-secondary">View</a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="no-data">
+                        <p>No recent contact messages</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+.admin-hero {
+    background: linear-gradient(135deg, var(--accent-color) 0%, var(--primary-color) 100%);
+    color: var(--white);
+    padding: var(--spacing-2xl) 0;
+    text-align: center;
+}
+
+.admin-user-info {
+    margin-top: var(--spacing-lg);
+}
+
+.admin-badge {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.2);
+    padding: var(--spacing-sm) var(--spacing-lg);
+    border-radius: var(--radius-lg);
+    font-weight: 600;
+    margin-bottom: var(--spacing-sm);
+}
+
+.admin-user-info p {
+    opacity: 0.9;
+    margin: var(--spacing-sm) 0;
+}
+
+.admin-content {
+    padding: var(--spacing-3xl) 0;
+}
+
+.admin-layout {
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    gap: var(--spacing-3xl);
+}
+
+.admin-sidebar {
+    position: sticky;
+    top: 100px;
+    height: fit-content;
+}
+
+.admin-nav {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    box-shadow: var(--shadow-md);
+}
+
+.admin-profile-header {
+    text-align: center;
+    padding: var(--spacing-lg) 0;
+    border-bottom: 2px solid var(--background);
+    margin-bottom: var(--spacing-lg);
+}
+
+.admin-profile-header h4 {
+    color: var(--accent-color);
+    margin-bottom: var(--spacing-xs);
+}
+
+.admin-role {
+    color: var(--text-light);
+    font-size: var(--font-size-sm);
+    margin: 0;
+}
+
+.nav-divider {
+    height: 1px;
+    background: var(--background);
+    margin: var(--spacing-md) 0;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+    color: var(--text-dark);
+    text-decoration: none;
+    border-radius: var(--radius-md);
+    transition: var(--transition);
+    margin-bottom: var(--spacing-sm);
+}
+
+.nav-item:hover {
+    background: var(--background);
+}
+
+.nav-item.active {
+    background: var(--accent-color);
+    color: var(--white);
+}
+
+.nav-icon {
+    font-size: var(--font-size-xl);
+}
+
+.admin-main {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2xl);
+}
+
+.stats-overview,
+.recent-applications,
+.recent-contacts {
+    background: var(--white);
+    padding: var(--spacing-2xl);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+}
+
+.stats-overview h2,
+.recent-applications h2,
+.recent-contacts h2 {
+    color: var(--accent-color);
+    margin-bottom: var(--spacing-xl);
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--spacing-lg);
+}
+
+.stat-card {
+    background: var(--background);
+    padding: var(--spacing-xl);
+    border-radius: var(--radius-md);
+    text-align: center;
+    position: relative;
+    transition: var(--transition);
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--accent-color);
+    margin-bottom: var(--spacing-sm);
+}
+
+.stat-label {
+    color: var(--text-light);
+    font-weight: 600;
+}
+
+.stat-icon {
+    position: absolute;
+    top: var(--spacing-md);
+    right: var(--spacing-md);
+    font-size: 1.5rem;
+    opacity: 0.5;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-xl);
+}
+
+.section-header h2 {
+    margin-bottom: 0;
+}
+
+.applications-table,
+.contacts-table {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+}
+
+.application-row,
+.contact-row {
+    display: grid;
+    grid-template-columns: 2fr auto auto;
+    gap: var(--spacing-lg);
+    padding: var(--spacing-lg);
+    background: var(--background);
+    border-radius: var(--radius-md);
+    align-items: center;
+}
+
+.applicant-details h3,
+.contact-info h3 {
+    margin-bottom: var(--spacing-xs);
+    color: var(--text-dark);
+}
+
+.application-email,
+.application-date,
+.contact-subject,
+.contact-date {
+    margin: var(--spacing-xs) 0;
+    color: var(--text-light);
+    font-size: var(--font-size-sm);
+}
+
+.pet-details h4 {
+    margin-bottom: var(--spacing-xs);
+    color: var(--primary-color);
+}
+
+.status-badge {
+    display: inline-block;
+    padding: var(--spacing-xs) var(--spacing-md);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.status-pending {
+    background: var(--warning);
+    color: var(--text-dark);
+}
+
+.status-approved {
+    background: var(--success);
+    color: var(--white);
+}
+
+.status-rejected {
+    background: var(--danger);
+    color: var(--white);
+}
+
+.status-completed {
+    background: var(--accent-color);
+    color: var(--white);
+}
+
+.status-new {
+    background: var(--primary-color);
+    color: var(--white);
+}
+
+.no-data {
+    text-align: center;
+    padding: var(--spacing-2xl);
+    color: var(--text-light);
+}
+
+.lead {
+    font-size: var(--font-size-xl);
+    opacity: 0.9;
+}
+</style>
+{% endblock %}

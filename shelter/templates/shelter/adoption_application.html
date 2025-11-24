@@ -1,0 +1,378 @@
+{% extends 'shelter/base.html' %}
+{% load static %}
+
+{% block title %}Adoption Application{% if pet %} - {{ pet.name }}{% endif %} - PawHaven Pet Shelter{% endblock %}
+
+{% block content %}
+<section class="application-hero">
+    <div class="container">
+        <h1>Adoption Application</h1>
+        {% if pet %}
+        <p class="lead">Apply to adopt {{ pet.name }}</p>
+        {% else %}
+        <p class="lead">Start your journey to adopt a pet</p>
+        {% endif %}
+    </div>
+</section>
+
+<section class="application-content">
+    <div class="container">
+        <div class="application-layout">
+            <!-- Application Form -->
+            <div class="application-form-section">
+                <form method="post" class="application-form">
+                    {% csrf_token %}
+                    
+                    {% if pet %}
+                    <input type="hidden" name="pet_id" value="{{ pet.id }}">
+                    
+                    <div class="selected-pet">
+                        <h3>Applying for:</h3>
+                        <div class="pet-summary">
+                            {% if pet.main_image %}
+                            <img src="{{ pet.main_image.url }}" alt="{{ pet.name }}">
+                            {% else %}
+                            <img src="{% static 'shelter/images/pets/placeholder.jpg' %}" alt="{{ pet.name }}">
+                            {% endif %}
+                            <div>
+                                <h4>{{ pet.name }}</h4>
+                                <p>{{ pet.breed }} • {{ pet.age }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="form-group">
+                        <label for="pet_id">Select Pet *</label>
+                        <select name="pet_id" id="pet_id" required class="form-control">
+                            <option value="">Choose a pet...</option>
+                            {% for available_pet in available_pets %}
+                            <option value="{{ available_pet.id }}">{{ available_pet.name }} - {{ available_pet.breed }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    {% endif %}
+
+                    <h3>Personal Information</h3>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="first_name">First Name *</label>
+                            <input type="text" id="first_name" name="first_name" required class="form-control">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="last_name">Last Name *</label>
+                            <input type="text" id="last_name" name="last_name" required class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="email">Email Address *</label>
+                            <input type="email" id="email" name="email" required class="form-control">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="phone">Phone Number *</label>
+                            <input type="tel" id="phone" name="phone" required class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="address">Full Address *</label>
+                        <textarea id="address" name="address" rows="3" required class="form-control"></textarea>
+                    </div>
+
+                    <h3>Housing Information</h3>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="housing_type">Type of Housing *</label>
+                            <select id="housing_type" name="housing_type" required class="form-control">
+                                <option value="">Select...</option>
+                                <option value="house">House</option>
+                                <option value="apartment">Apartment</option>
+                                <option value="condo">Condo</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="own_or_rent">Do you own or rent? *</label>
+                            <select id="own_or_rent" name="own_or_rent" required class="form-control" onchange="toggleLandlordField()">
+                                <option value="">Select...</option>
+                                <option value="own">Own</option>
+                                <option value="rent">Rent</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group" id="landlord-approval-group" style="display: none;">
+                        <label for="landlord_approval">Do you have landlord approval for pets? *</label>
+                        <select id="landlord_approval" name="landlord_approval" class="form-control">
+                            <option value="">Select...</option>
+                            <option value="yes">Yes</option>
+                            <option value="no">No</option>
+                        </select>
+                    </div>
+
+                    <h3>Household Information</h3>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="household_adults">Number of Adults *</label>
+                            <input type="number" id="household_adults" name="household_adults" min="1" required class="form-control">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="household_children">Number of Children</label>
+                            <input type="number" id="household_children" name="household_children" min="0" value="0" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="has_other_pets">Do you have other pets? *</label>
+                        <select id="has_other_pets" name="has_other_pets" required class="form-control" onchange="toggleOtherPetsField()">
+                            <option value="">Select...</option>
+                            <option value="yes">Yes</option>
+                            <option value="no">No</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" id="other-pets-group" style="display: none;">
+                        <label for="other_pets_description">Please describe your other pets *</label>
+                        <textarea id="other_pets_description" name="other_pets_description" rows="3" class="form-control"></textarea>
+                    </div>
+
+                    <h3>Pet Experience & Commitment</h3>
+
+                    <div class="form-group">
+                        <label for="previous_pet_experience">Please describe your previous pet experience *</label>
+                        <textarea id="previous_pet_experience" name="previous_pet_experience" rows="4" required class="form-control" placeholder="Tell us about any pets you've had before, how long you had them, etc."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="reason_for_adoption">Why do you want to adopt this pet? *</label>
+                        <textarea id="reason_for_adoption" name="reason_for_adoption" rows="4" required class="form-control" placeholder="Tell us what drew you to this pet and what you hope to provide for them."></textarea>
+                    </div>
+
+                    <div class="form-agreement">
+                        <label class="checkbox-label">
+                            <input type="checkbox" required>
+                            I understand that providing false information may result in the denial of my application or revocation of adoption privileges. I certify that all information provided is true and accurate.
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-large">Submit Application</button>
+                </form>
+            </div>
+
+            <!-- Sidebar Information -->
+            <aside class="application-sidebar">
+                <div class="info-box">
+                    <h3>What Happens Next?</h3>
+                    <ol>
+                        <li><strong>Review</strong> - We'll review your application within 24-48 hours</li>
+                        <li><strong>Contact</strong> - We'll reach out via phone or email</li>
+                        <li><strong>Meet & Greet</strong> - Schedule a visit to meet your potential pet</li>
+                        <li><strong>Finalize</strong> - Complete paperwork and take them home!</li>
+                    </ol>
+                </div>
+
+                <div class="info-box">
+                    <h3>Requirements</h3>
+                    <ul>
+                        <li>Must be 21 years or older</li>
+                        <li>Valid photo ID</li>
+                        <li>Landlord approval (if renting)</li>
+                        <li>All household members should meet the pet</li>
+                    </ul>
+                </div>
+
+                <div class="info-box">
+                    <h3>Questions?</h3>
+                    <p>Contact us at:</p>
+                    <p>📞 (555) 123-PETS</p>
+                    <p>✉️ info@pawhaven.com</p>
+                </div>
+            </aside>
+        </div>
+    </div>
+</section>
+
+<style>
+.application-hero {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+    color: var(--white);
+    padding: var(--spacing-3xl) 0;
+    text-align: center;
+}
+
+.application-content {
+    padding: var(--spacing-3xl) 0;
+}
+
+.application-layout {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: var(--spacing-3xl);
+}
+
+.application-form-section {
+    background: var(--white);
+    padding: var(--spacing-2xl);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+}
+
+.selected-pet {
+    background: var(--background);
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--spacing-2xl);
+}
+
+.pet-summary {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-lg);
+    margin-top: var(--spacing-md);
+}
+
+.pet-summary img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: var(--radius-md);
+}
+
+.application-form h3 {
+    color: var(--primary-color);
+    margin: var(--spacing-2xl) 0 var(--spacing-lg);
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 2px solid var(--primary-color);
+}
+
+.application-form h3:first-of-type {
+    margin-top: 0;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-lg);
+}
+
+.form-group {
+    margin-bottom: var(--spacing-lg);
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: var(--spacing-sm);
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.form-control {
+    width: 100%;
+    padding: var(--spacing-md);
+    border: 2px solid var(--gray-medium);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-base);
+    font-family: inherit;
+    transition: var(--transition);
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+select.form-control {
+    cursor: pointer;
+}
+
+.form-agreement {
+    background: var(--background);
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-md);
+    margin: var(--spacing-xl) 0;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-md);
+    cursor: pointer;
+    font-weight: normal;
+}
+
+.checkbox-label input[type="checkbox"] {
+    margin-top: 4px;
+    transform: scale(1.2);
+}
+
+.application-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+}
+
+.info-box {
+    background: var(--white);
+    padding: var(--spacing-xl);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+}
+
+.info-box h3 {
+    color: var(--primary-color);
+    margin-bottom: var(--spacing-lg);
+}
+
+.info-box ol, .info-box ul {
+    padding-left: var(--spacing-lg);
+}
+
+.info-box li {
+    margin-bottom: var(--spacing-sm);
+    line-height: 1.6;
+}
+
+.lead {
+    font-size: var(--font-size-xl);
+    opacity: 0.9;
+}
+</style>
+
+<script>
+function toggleLandlordField() {
+    const ownOrRent = document.getElementById('own_or_rent').value;
+    const landlordGroup = document.getElementById('landlord-approval-group');
+    const landlordApproval = document.getElementById('landlord_approval');
+    
+    if (ownOrRent === 'rent') {
+        landlordGroup.style.display = 'block';
+        landlordApproval.required = true;
+    } else {
+        landlordGroup.style.display = 'none';
+        landlordApproval.required = false;
+    }
+}
+
+function toggleOtherPetsField() {
+    const hasOtherPets = document.getElementById('has_other_pets').value;
+    const otherPetsGroup = document.getElementById('other-pets-group');
+    const otherPetsDescription = document.getElementById('other_pets_description');
+    
+    if (hasOtherPets === 'yes') {
+        otherPetsGroup.style.display = 'block';
+        otherPetsDescription.required = true;
+    } else {
+        otherPetsGroup.style.display = 'none';
+        otherPetsDescription.required = false;
+    }
+}
+</script>
+{% endblock %}

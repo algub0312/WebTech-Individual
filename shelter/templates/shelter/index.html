@@ -1,0 +1,125 @@
+{% extends 'shelter/base.html' %}
+{% load static %}
+
+{% block title %}Home - PawHaven Pet Shelter{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="hero-container">
+        <div class="hero-content">
+            <h1 class="hero-title">Find Your Perfect Companion</h1>
+            <p class="hero-subtitle">
+                Give a loving home to a pet in need. Every adoption saves a life
+                and makes room for another rescue.
+            </p>
+            <div class="hero-buttons">
+                <a href="{% url 'pets' %}" class="btn btn-primary">Browse Pets</a>
+                <a href="{% url 'about' %}" class="btn btn-secondary">Learn More</a>
+            </div>
+        </div>
+        <div class="hero-image">
+            <img src="{% static 'shelter/images/backgrounds/hero-pets.jpg' %}" alt="Happy pets at the shelter">
+        </div>
+    </div>
+</section>
+
+<!-- Quick Stats Section -->
+<section class="stats-section">
+    <div class="container">
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-number" data-count="{{ stats.total_adopted }}">0</div>
+                <div class="stat-label">Pets Adopted</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" data-count="{{ stats.available_now }}">0</div>
+                <div class="stat-label">Available Now</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" data-count="{{ stats.happy_families }}">0</div>
+                <div class="stat-label">Happy Families</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" data-count="{{ stats.years_of_service }}">0</div>
+                <div class="stat-label">Years of Service</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Pets Section -->
+<section class="featured-pets">
+    <div class="container">
+        <div class="section-header">
+            <h2>Meet our Featured Pets</h2>
+            <p>These wonderful animals are looking for their forever homes</p>
+        </div>
+
+        <div class="pets-grid">
+            {% for pet in featured_pets %}
+            <article class="pet-card">
+                <div class="pet-image">
+                    {% if pet.main_image %}
+                        <img src="{{ pet.main_image.url }}" alt="{{ pet.name }} - {{ pet.breed }}">
+                    {% else %}
+                        <img src="{% static 'shelter/images/pets/placeholder.jpg' %}" alt="{{ pet.name }} - {{ pet.breed }}">
+                    {% endif %}
+                    {% if pet.get_badge %}
+                    <div class="pet-badge">{{ pet.get_badge }}</div>
+                    {% endif %}
+                </div>
+                <div class="pet-info">
+                    <h3 class="pet-name">{{ pet.name }}</h3>
+                    <p class="pet-breed">{{ pet.breed }}</p>
+                    <p class="pet-age">{{ pet.age }}</p>
+                    <a href="{% url 'pet_detail' pet.pk pet.slug %}" class="btn btn-small">Meet {{ pet.name }}</a>
+                </div>
+            </article>
+            {% empty %}
+            <p>No featured pets available at the moment. Check back soon!</p>
+            {% endfor %}
+        </div>
+
+        <div class="section-footer">
+            <a href="{% url 'pets' %}" class="btn btn-outline">View All Available Pets</a>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action Section -->
+<section class="cta-section">
+    <div class="container">
+        <div class="cta-content">
+            <h2>Ready to Change a Life?</h2>
+            <p>Start your adoption journey today and give a deserving pet the loving home they've been waiting for.</p>
+            <a href="{% url 'adoption_gate' %}" class="btn btn-large btn-primary">Start Application</a>
+        </div>
+    </div>
+</section>
+
+<!-- Quick Links Aside -->
+<aside class="quick-links">
+    <div class="container">
+        <h3>Quick Links</h3>
+        <div class="links-grid">
+            <a href="{% url 'adoption_gate' %}" class="quick-link">
+                <div class="link-icon">🐕</div>
+                <div class="link-text">Adopt a Pet</div>
+            </a>
+            <a href="{% url 'contact' %}" class="quick-link">
+                <div class="link-icon">📞</div>
+                <div class="link-text">Contact Us</div>
+            </a>
+            <a href="{% url 'success_stories' %}" class="quick-link">
+                <div class="link-icon">❤️</div>
+                <div class="link-text">Success Stories</div>
+            </a>
+            <a href="{% url 'about' %}" class="quick-link">
+                <div class="link-icon">ℹ️</div>
+                <div class="link-text">About Our Shelter</div>
+            </a>
+        </div>
+    </div>
+</aside>
+{% endblock %}

@@ -1,0 +1,138 @@
+{% extends 'shelter/base.html' %}
+{% load static %}
+
+{% block title %}Success Stories - PawHaven Pet Shelter{% endblock %}
+
+{% block content %}
+<section class="success-hero">
+    <div class="container">
+        <h1>Success Stories</h1>
+        <p class="lead">Celebrating the happy endings and new beginnings</p>
+    </div>
+</section>
+
+<section class="success-content">
+    <div class="container">
+        {% if stories %}
+        <div class="stories-grid">
+            {% for story in stories %}
+            <article class="story-card">
+                {% if story.image %}
+                <div class="story-image">
+                    <img src="{{ story.image.url }}" alt="{{ story.title }}">
+                </div>
+                {% endif %}
+                <div class="story-content">
+                    <h3>{{ story.title }}</h3>
+                    <p class="story-meta">
+                        Adopted by {{ story.adopter_name }} on {{ story.adoption_date|date:"F d, Y" }}
+                    </p>
+                    <p>{{ story.story|truncatewords:50 }}</p>
+                    {% if story.pet %}
+                    <p class="story-pet">Pet: <a href="{% url 'pet_detail' story.pet.pk story.pet.slug %}">{{ story.pet.name }}</a></p>
+                    {% endif %}
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="no-stories">
+            <p>Check back soon for heartwarming adoption success stories!</p>
+        </div>
+        {% endif %}
+
+        <div class="cta-section">
+            <h2>Want to Create Your Own Success Story?</h2>
+            <p>Browse our available pets and start your adoption journey today!</p>
+            <a href="{% url 'pets' %}" class="btn btn-primary btn-large">Find Your Perfect Pet</a>
+        </div>
+    </div>
+</section>
+
+<style>
+.success-hero {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+    color: var(--white);
+    padding: var(--spacing-3xl) 0;
+    text-align: center;
+}
+
+.success-content {
+    padding: var(--spacing-3xl) 0;
+}
+
+.stories-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-2xl);
+    margin-bottom: var(--spacing-3xl);
+}
+
+.story-card {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+    transition: var(--transition);
+}
+
+.story-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+}
+
+.story-image img {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+}
+
+.story-content {
+    padding: var(--spacing-xl);
+}
+
+.story-content h3 {
+    color: var(--primary-color);
+    margin-bottom: var(--spacing-sm);
+}
+
+.story-meta {
+    color: var(--text-light);
+    font-size: var(--font-size-sm);
+    margin-bottom: var(--spacing-md);
+}
+
+.story-pet {
+    margin-top: var(--spacing-md);
+    font-weight: 600;
+}
+
+.no-stories {
+    text-align: center;
+    padding: var(--spacing-3xl);
+    background: var(--white);
+    border-radius: var(--radius-lg);
+}
+
+.cta-section {
+    text-align: center;
+    padding: var(--spacing-3xl);
+    background: var(--gray-light);
+    border-radius: var(--radius-lg);
+}
+
+.cta-section h2 {
+    margin-bottom: var(--spacing-lg);
+}
+
+.cta-section p {
+    font-size: var(--font-size-lg);
+    margin-bottom: var(--spacing-xl);
+}
+
+.lead {
+    font-size: var(--font-size-xl);
+    opacity: 0.9;
+}
+</style>
+{% endblock %}

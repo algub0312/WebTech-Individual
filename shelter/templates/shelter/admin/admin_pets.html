@@ -1,0 +1,578 @@
+{% extends 'shelter/base.html' %}
+{% load static %}
+
+{% block title %}Manage Pets - Admin Dashboard{% endblock %}
+
+{% block content %}
+<section class="admin-hero">
+    <div class="container">
+        <h1>Manage Pets</h1>
+        <p class="lead">View and manage all pets in the shelter</p>
+    </div>
+</section>
+
+<section class="admin-content">
+    <div class="container">
+        <div class="admin-layout">
+            <!-- Sidebar Navigation -->
+            <aside class="admin-sidebar">
+                <nav class="admin-nav">
+                    <div class="admin-profile-header">
+                        <h4>{{ user.first_name|default:user.username }}</h4>
+                        <p class="admin-role">Administrator</p>
+                    </div>
+                    <a href="{% url 'admin_dashboard' %}" class="nav-item">
+                        <span class="nav-icon">📊</span>
+                        Dashboard
+                    </a>
+                    <a href="{% url 'admin_applications' %}" class="nav-item">
+                        <span class="nav-icon">📝</span>
+                        All Applications
+                    </a>
+                    <a href="{% url 'admin_pets' %}" class="nav-item active">
+                        <span class="nav-icon">🐾</span>
+                        Manage Pets
+                    </a>
+                    <a href="{% url 'admin_contacts' %}" class="nav-item">
+                        <span class="nav-icon">📞</span>
+                        Contact Messages
+                    </a>
+                    <a href="/admin/" class="nav-item">
+                        <span class="nav-icon">⚙️</span>
+                        Django Admin
+                    </a>
+                    <div class="nav-divider"></div>
+                    <a href="{% url 'pets' %}" class="nav-item">
+                        <span class="nav-icon">🏠</span>
+                        Public Site
+                    </a>
+                    <a href="{% url 'logout' %}" class="nav-item">
+                        <span class="nav-icon">🚪</span>
+                        Logout
+                    </a>
+                </nav>
+            </aside>
+
+            <!-- Main Content -->
+            <div class="admin-main">
+                <!-- Filters and Search -->
+                <div class="filters-section">
+                    <div class="section-header">
+                        <h2>All Pets ({{ total_pets }})</h2>
+                        <div class="filter-controls">
+                            <form method="get" class="filter-form">
+                                <select name="status" onchange="this.form.submit()">
+                                    <option value="">All Statuses</option>
+                                    <option value="available" {% if request.GET.status == 'available' %}selected{% endif %}>Available</option>
+                                    <option value="pending" {% if request.GET.status == 'pending' %}selected{% endif %}>Pending</option>
+                                    <option value="adopted" {% if request.GET.status == 'adopted' %}selected{% endif %}>Adopted</option>
+                                </select>
+                                <select name="type" onchange="this.form.submit()">
+                                    <option value="">All Types</option>
+                                    <option value="dog" {% if request.GET.type == 'dog' %}selected{% endif %}>Dogs</option>
+                                    <option value="cat" {% if request.GET.type == 'cat' %}selected{% endif %}>Cats</option>
+                                    <option value="rabbit" {% if request.GET.type == 'rabbit' %}selected{% endif %}>Rabbits</option>
+                                    <option value="bird" {% if request.GET.type == 'bird' %}selected{% endif %}>Birds</option>
+                                </select>
+                                <input type="text" name="search" placeholder="Search by name or breed..." 
+                                       value="{{ request.GET.search }}" class="search-input">
+                                <button type="submit" class="btn btn-small btn-primary">Filter</button>
+                                <a href="{% url 'admin_pets' %}" class="btn btn-small btn-outline">Clear</a>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pets Grid -->
+                <div class="pets-section">
+                    {% if pets %}
+                    <div class="pets-grid">
+                        {% for pet in pets %}
+                        <div class="pet-card admin-pet-card">
+                            <div class="pet-image">
+                                {% if pet.main_image %}
+                                <img src="{{ pet.main_image.url }}" alt="{{ pet.name }}">
+                                {% else %}
+                                <img src="{% static 'shelter/images/pets/placeholder.jpg' %}" alt="{{ pet.name }}">
+                                {% endif %}
+                                <div class="pet-status-badge status-{{ pet.status }}">
+                                    {{ pet.get_status_display }}
+                                </div>
+                                {% if pet.featured %}
+                                <div class="featured-badge">⭐ Featured</div>
+                                {% endif %}
+                            </div>
+                            <div class="pet-info">
+                                <h3>{{ pet.name }}</h3>
+                                <p class="pet-breed">{{ pet.breed }}</p>
+                                <p class="pet-details">{{ pet.age }} • {{ pet.gender }} • {{ pet.size }}</p>
+                                <p class="arrival-date">Arrived: {{ pet.arrival_date|date:"M d, Y" }}</p>
+                                <p class="adoption-fee">${{ pet.adoption_fee }}</p>
+                                
+                                {% if pet.special_needs %}
+                                <div class="special-needs-indicator">⚠️ Special Needs</div>
+                                {% endif %}
+
+                                <!-- Application Count -->
+                                {% with application_count=pet.applications.count %}
+                                {% if application_count > 0 %}
+                                <p class="application-count">
+                                    📝 {{ application_count }} application{{ application_count|pluralize }}
+                                </p>
+                                {% endif %}
+                                {% endwith %}
+
+                                <!-- Quick Actions -->
+                                <div class="pet-actions">
+                                    <a href="{% url 'pet_detail' pet.pk pet.slug %}" class="btn-compact btn-outline">View</a>
+                                    <a href="/admin/shelter/pet/{{ pet.id }}/change/" class="btn-compact btn-primary">Edit</a>
+                                    {% if pet.status == 'available' %}
+                                    <a href="{% url 'admin_applications' %}?search={{ pet.name }}" class="btn-compact btn-secondary">Apps</a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Pagination -->
+                    {% if is_paginated %}
+                    <div class="pagination-container">
+                        <div class="pagination">
+                            {% if page_obj.has_previous %}
+                            <a href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" 
+                               class="pagination-btn">← Previous</a>
+                            {% endif %}
+                            
+                            <span class="page-info">
+                                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                            </span>
+                            
+                            {% if page_obj.has_next %}
+                            <a href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" 
+                               class="pagination-btn">Next →</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% else %}
+                    <div class="no-pets">
+                        <h3>No pets found</h3>
+                        <p>No pets match your current filters.</p>
+                        <a href="/admin/shelter/pet/add/" class="btn btn-primary">Add New Pet</a>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Quick Stats -->
+                <div class="pets-stats">
+                    <h3>Pet Statistics</h3>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-number">{{ pets|length }}</div>
+                            <div class="stat-label">Showing</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">{{ total_pets }}</div>
+                            <div class="stat-label">Total Pets</div>
+                        </div>
+                    </div>
+                    
+                    <div class="quick-actions">
+                        <a href="/admin/shelter/pet/add/" class="btn btn-primary">➕ Add New Pet</a>
+                        <a href="/admin/shelter/pet/" class="btn btn-outline">Django Admin</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+.admin-hero {
+    background: linear-gradient(135deg, var(--accent-color) 0%, var(--primary-color) 100%);
+    color: var(--white);
+    padding: var(--spacing-2xl) 0;
+    text-align: center;
+}
+
+.admin-content {
+    padding: var(--spacing-3xl) 0;
+}
+
+.admin-layout {
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    gap: var(--spacing-3xl);
+}
+
+.admin-sidebar {
+    position: sticky;
+    top: 100px;
+    height: fit-content;
+}
+
+.admin-nav {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    box-shadow: var(--shadow-md);
+}
+
+.admin-profile-header {
+    text-align: center;
+    padding: var(--spacing-lg) 0;
+    border-bottom: 2px solid var(--background);
+    margin-bottom: var(--spacing-lg);
+}
+
+.admin-profile-header h4 {
+    color: var(--accent-color);
+    margin-bottom: var(--spacing-xs);
+}
+
+.admin-role {
+    color: var(--text-light);
+    font-size: var(--font-size-sm);
+    margin: 0;
+}
+
+.nav-divider {
+    height: 1px;
+    background: var(--background);
+    margin: var(--spacing-md) 0;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+    color: var(--text-dark);
+    text-decoration: none;
+    border-radius: var(--radius-md);
+    transition: var(--transition);
+    margin-bottom: var(--spacing-sm);
+}
+
+.nav-item:hover {
+    background: var(--background);
+}
+
+.nav-item.active {
+    background: var(--accent-color);
+    color: var(--white);
+}
+
+.nav-icon {
+    font-size: var(--font-size-xl);
+}
+
+.admin-main {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xl);
+}
+
+.filters-section,
+.pets-section,
+.pets-stats {
+    background: var(--white);
+    padding: var(--spacing-xl);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+}
+
+.section-header h2 {
+    color: var(--accent-color);
+    margin-bottom: 0;
+}
+
+.filter-form {
+    display: flex;
+    gap: var(--spacing-md);
+    align-items: center;
+}
+
+.filter-form select,
+.search-input {
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: 2px solid var(--gray-medium);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+}
+
+.search-input {
+    min-width: 250px;
+}
+
+.pets-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--spacing-lg);
+}
+
+.admin-pet-card {
+    position: relative;
+    border: 2px solid transparent;
+    transition: var(--transition);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+}
+
+.admin-pet-card:hover {
+    border-color: var(--accent-color);
+    transform: translateY(-2px);
+}
+
+.pet-image {
+    position: relative;
+    height: 180px;
+    overflow: hidden;
+}
+
+.pet-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.pet-status-badge {
+    position: absolute;
+    top: var(--spacing-sm);
+    left: var(--spacing-sm);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.pet-status-badge.status-available {
+    background: var(--success);
+    color: var(--white);
+}
+
+.pet-status-badge.status-pending {
+    background: var(--warning);
+    color: var(--text-dark);
+}
+
+.pet-status-badge.status-adopted {
+    background: var(--accent-color);
+    color: var(--white);
+}
+
+.featured-badge {
+    position: absolute;
+    top: var(--spacing-sm);
+    right: var(--spacing-sm);
+    background: var(--secondary-color);
+    color: var(--text-dark);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+}
+
+.pet-info {
+    padding: var(--spacing-lg);
+    background: var(--white);
+}
+
+.pet-info h3 {
+    color: var(--text-dark);
+    margin-bottom: var(--spacing-xs);
+    font-size: var(--font-size-lg);
+}
+
+.pet-breed,
+.pet-details,
+.arrival-date {
+    color: var(--text-light);
+    font-size: var(--font-size-sm);
+    margin: var(--spacing-xs) 0;
+}
+
+.adoption-fee {
+    color: var(--accent-color);
+    font-weight: 600;
+    margin: var(--spacing-sm) 0;
+    font-size: var(--font-size-base);
+}
+
+.special-needs-indicator {
+    background: var(--warning);
+    color: var(--text-dark);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    display: inline-block;
+    margin: var(--spacing-sm) 0;
+}
+
+.application-count {
+    color: var(--primary-color);
+    font-weight: 600;
+    font-size: var(--font-size-sm);
+    margin: var(--spacing-sm) 0;
+}
+
+/* Compact buttons for pet actions */
+.pet-actions {
+    display: flex;
+    gap: var(--spacing-xs);
+    margin-top: var(--spacing-md);
+    flex-wrap: wrap;
+}
+
+.btn-compact {
+    display: inline-block;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none;
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: var(--transition);
+    min-width: 40px;
+    line-height: 1.2;
+    flex: 1;
+}
+
+.btn-compact:focus {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 1px;
+}
+
+.btn-compact.btn-primary {
+    background-color: var(--primary-color);
+    color: var(--white);
+    border-color: var(--primary-color);
+}
+
+.btn-compact.btn-primary:hover {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+    transform: translateY(-1px);
+}
+
+.btn-compact.btn-secondary {
+    background-color: var(--secondary-color);
+    color: var(--text-dark);
+    border-color: var(--secondary-color);
+}
+
+.btn-compact.btn-secondary:hover {
+    background-color: var(--warning);
+    border-color: var(--warning);
+    transform: translateY(-1px);
+}
+
+.btn-compact.btn-outline {
+    background-color: transparent;
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-compact.btn-outline:hover {
+    background-color: var(--primary-color);
+    color: var(--white);
+    transform: translateY(-1px);
+}
+
+.pets-stats h3 {
+    color: var(--accent-color);
+    margin-bottom: var(--spacing-lg);
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+}
+
+.stat-item {
+    text-align: center;
+    padding: var(--spacing-md);
+    background: var(--background);
+    border-radius: var(--radius-md);
+}
+
+.stat-number {
+    font-size: var(--font-size-2xl);
+    font-weight: 700;
+    color: var(--accent-color);
+}
+
+.stat-label {
+    color: var(--text-light);
+    font-size: var(--font-size-sm);
+}
+
+.quick-actions {
+    display: flex;
+    gap: var(--spacing-md);
+}
+
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    margin-top: var(--spacing-xl);
+}
+
+.pagination {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+}
+
+.pagination-btn {
+    padding: var(--spacing-sm) var(--spacing-lg);
+    background: var(--accent-color);
+    color: var(--white);
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: var(--transition);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.pagination-btn:hover {
+    background: var(--primary-color);
+    transform: translateY(-2px);
+}
+
+.page-info {
+    padding: var(--spacing-sm) var(--spacing-lg);
+    color: var(--text-light);
+    font-weight: 500;
+}
+
+.no-pets {
+    text-align: center;
+    padding: var(--spacing-3xl);
+    color: var(--text-light);
+}
+
+.lead {
+    font-size: var(--font-size-xl);
+    opacity: 0.9;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,364 @@
+{% extends 'shelter/base.html' %}
+{% load static %}
+
+{% block title %}My Applications - PawHaven Pet Shelter{% endblock %}
+
+{% block content %}
+<section class="account-hero">
+    <div class="container">
+        <h1>My Adoption Applications</h1>
+        <p class="lead">Track the status of all your applications</p>
+    </div>
+</section>
+
+<section class="account-content">
+    <div class="container">
+        <div class="account-layout">
+            <!-- Sidebar Navigation -->
+            <aside class="account-sidebar">
+                <nav class="account-nav">
+                    <a href="{% url 'account' %}" class="nav-item">
+                        <span class="nav-icon">👤</span>
+                        Profile
+                    </a>
+                    <a href="{% url 'user_applications' %}" class="nav-item active">
+                        <span class="nav-icon">📝</span>
+                        My Applications
+                    </a>
+                    <a href="{% url 'edit_profile' %}" class="nav-item">
+                        <span class="nav-icon">✏️</span>
+                        Edit Profile
+                    </a>
+                    <a href="{% url 'pets' %}" class="nav-item">
+                        <span class="nav-icon">🐾</span>
+                        Browse Pets
+                    </a>
+                    <a href="{% url 'logout' %}" class="nav-item">
+                        <span class="nav-icon">🚪</span>
+                        Logout
+                    </a>
+                </nav>
+            </aside>
+
+            <!-- Main Content -->
+            <div class="account-main">
+                <div class="applications-section">
+                    <div class="section-header">
+                        <h2>All Applications</h2>
+                        <p>Total: {{ applications.count }} application{{ applications.count|pluralize }}</p>
+                    </div>
+
+                    {% if applications %}
+                    <div class="applications-table">
+                        {% for application in applications %}
+                        <div class="application-row">
+                            <div class="application-pet-info">
+                                {% if application.pet.main_image %}
+                                <img src="{{ application.pet.main_image.url }}" alt="{{ application.pet.name }}" class="pet-thumbnail">
+                                {% else %}
+                                <img src="{% static 'shelter/images/pets/placeholder.jpg' %}" alt="{{ application.pet.name }}" class="pet-thumbnail">
+                                {% endif %}
+                                <div class="pet-details">
+                                    <h3>{{ application.pet.name }}</h3>
+                                    <p class="pet-breed">{{ application.pet.breed }} • {{ application.pet.age }}</p>
+                                </div>
+                            </div>
+
+                            <div class="application-status-info">
+                                <p class="submission-date">
+                                    <strong>Submitted:</strong> {{ application.submitted_at|date:"M d, Y" }}
+                                </p>
+                                <span class="status-badge status-{{ application.status }}">
+                                    {{ application.get_status_display }}
+                                </span>
+                            </div>
+
+                            <div class="application-actions">
+                                <a href="{% url 'pet_detail' application.pet.pk application.pet.slug %}" class="btn btn-small btn-outline">View Pet</a>
+                                {% if application.status == 'pending' %}
+                                <a href="{% url 'contact' %}" class="btn btn-small btn-secondary">Contact Us</a>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        {% if application.notes and application.status != 'pending' %}
+                        <div class="application-notes">
+                            <strong>Note from shelter:</strong> {{ application.notes }}
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="no-applications">
+                        <div class="empty-state">
+                            <div class="empty-icon">📋</div>
+                            <h3>No Applications Yet</h3>
+                            <p>You haven't submitted any adoption applications. Browse our available pets to get started!</p>
+                            <a href="{% url 'pets' %}" class="btn btn-primary btn-large">Browse Available Pets</a>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                {% if applications %}
+                <div class="info-section">
+                    <h3>Application Status Guide</h3>
+                    <div class="status-guide">
+                        <div class="status-item">
+                            <span class="status-badge status-pending">Pending Review</span>
+                            <p>Your application is being reviewed by our team. We'll contact you within 24-48 hours.</p>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-badge status-approved">Approved</span>
+                            <p>Congratulations! Your application has been approved. We'll schedule a meet & greet.</p>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-badge status-rejected">Rejected</span>
+                            <p>Unfortunately, we couldn't approve this application at this time. Please contact us for more information.</p>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-badge status-completed">Adoption Completed</span>
+                            <p>Congratulations on your new family member! Thank you for adopting from PawHaven.</p>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+.account-hero {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+    color: var(--white);
+    padding: var(--spacing-3xl) 0;
+    text-align: center;
+}
+
+.account-content {
+    padding: var(--spacing-3xl) 0;
+}
+
+.account-layout {
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    gap: var(--spacing-3xl);
+}
+
+.account-sidebar {
+    position: sticky;
+    top: 100px;
+    height: fit-content;
+}
+
+.account-nav {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    box-shadow: var(--shadow-md);
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+    color: var(--text-dark);
+    text-decoration: none;
+    border-radius: var(--radius-md);
+    transition: var(--transition);
+    margin-bottom: var(--spacing-sm);
+}
+
+.nav-item:hover {
+    background: var(--background);
+}
+
+.nav-item.active {
+    background: var(--primary-color);
+    color: var(--white);
+}
+
+.nav-icon {
+    font-size: var(--font-size-xl);
+}
+
+.applications-section {
+    background: var(--white);
+    padding: var(--spacing-2xl);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    margin-bottom: var(--spacing-xl);
+}
+
+.section-header {
+    margin-bottom: var(--spacing-2xl);
+    padding-bottom: var(--spacing-lg);
+    border-bottom: 2px solid var(--primary-color);
+}
+
+.section-header h2 {
+    color: var(--primary-color);
+    margin-bottom: var(--spacing-xs);
+}
+
+.section-header p {
+    color: var(--text-light);
+}
+
+.applications-table {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xl);
+}
+
+.application-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr auto;
+    gap: var(--spacing-lg);
+    padding: var(--spacing-lg);
+    background: var(--background);
+    border-radius: var(--radius-md);
+    align-items: center;
+}
+
+.application-pet-info {
+    display: flex;
+    gap: var(--spacing-lg);
+    align-items: center;
+}
+
+.pet-thumbnail {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: var(--radius-md);
+}
+
+.pet-details h3 {
+    margin-bottom: var(--spacing-xs);
+}
+
+.pet-breed {
+    color: var(--text-light);
+    font-size: var(--font-size-sm);
+}
+
+.application-status-info {
+    text-align: center;
+}
+
+.submission-date {
+    margin-bottom: var(--spacing-sm);
+    color: var(--text-light);
+    font-size: var(--font-size-sm);
+}
+
+.status-badge {
+    display: inline-block;
+    padding: var(--spacing-xs) var(--spacing-md);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.status-pending {
+    background: var(--warning);
+    color: var(--text-dark);
+}
+
+.status-approved {
+    background: var(--success);
+    color: var(--white);
+}
+
+.status-rejected {
+    background: var(--danger);
+    color: var(--white);
+}
+
+.status-completed {
+    background: var(--accent-color);
+    color: var(--white);
+}
+
+.application-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+    flex-direction: column;
+}
+
+.application-notes {
+    padding: var(--spacing-lg);
+    background: var(--gray-light);
+    border-left: 4px solid var(--accent-color);
+    margin-top: calc(-1 * var(--spacing-lg));
+    margin-bottom: var(--spacing-lg);
+    border-radius: 0 0 var(--radius-md) var(--radius-md);
+}
+
+.no-applications {
+    padding: var(--spacing-3xl) 0;
+}
+
+.empty-state {
+    text-align: center;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.empty-icon {
+    font-size: 5rem;
+    margin-bottom: var(--spacing-xl);
+}
+
+.empty-state h3 {
+    color: var(--primary-color);
+    margin-bottom: var(--spacing-lg);
+}
+
+.empty-state p {
+    color: var(--text-light);
+    margin-bottom: var(--spacing-2xl);
+}
+
+.info-section {
+    background: var(--white);
+    padding: var(--spacing-2xl);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+}
+
+.info-section h3 {
+    color: var(--primary-color);
+    margin-bottom: var(--spacing-xl);
+}
+
+.status-guide {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+}
+
+.status-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-lg);
+    padding: var(--spacing-lg);
+    background: var(--background);
+    border-radius: var(--radius-md);
+}
+
+.status-item p {
+    margin: 0;
+    flex: 1;
+}
+
+.lead {
+    font-size: var(--font-size-xl);
+    opacity: 0.9;
+}
+</style>
+{% endblock %}

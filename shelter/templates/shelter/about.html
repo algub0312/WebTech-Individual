@@ -1,0 +1,77 @@
+{% extends 'shelter/base.html' %}
+{% load static %}
+
+{% block title %}About Us - PawHaven Pet Shelter{% endblock %}
+
+{% block content %}
+<section class="about-hero">
+    <div class="container">
+        <h1>About PawHaven</h1>
+        <p class="lead">Dedicated to finding loving homes for pets in need since 2016</p>
+    </div>
+</section>
+
+<section class="about-content">
+    <div class="container">
+        <div class="content-section">
+            <h2>Our Mission</h2>
+            <p>PawHaven Pet Shelter is committed to rescuing, rehabilitating, and rehoming abandoned and neglected animals. We believe every pet deserves a second chance at happiness in a loving forever home.</p>
+        </div>
+
+        <div class="content-section">
+            <h2>What We Do</h2>
+            <ul>
+                <li>Rescue abandoned and surrendered pets</li>
+                <li>Provide medical care and rehabilitation</li>
+                <li>Match pets with loving families</li>
+                <li>Educate the community about responsible pet ownership</li>
+                <li>Support pet owners to prevent surrenders</li>
+            </ul>
+        </div>
+
+        <div class="content-section">
+            <h2>Our Values</h2>
+            <p>Compassion, Dedication, and Community are at the heart of everything we do. We treat every animal with respect and care, working tirelessly to improve their lives.</p>
+        </div>
+    </div>
+</section>
+
+<style>
+.about-hero {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+    color: var(--white);
+    padding: var(--spacing-3xl) 0;
+    text-align: center;
+}
+
+.about-content {
+    padding: var(--spacing-3xl) 0;
+}
+
+.content-section {
+    background: var(--white);
+    padding: var(--spacing-2xl);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--spacing-xl);
+    box-shadow: var(--shadow-md);
+}
+
+.content-section h2 {
+    color: var(--primary-color);
+    margin-bottom: var(--spacing-lg);
+}
+
+.content-section ul {
+    list-style-position: inside;
+}
+
+.content-section li {
+    padding: var(--spacing-sm) 0;
+}
+
+.lead {
+    font-size: var(--font-size-xl);
+    opacity: 0.9;
+}
+</style>
+{% endblock %}

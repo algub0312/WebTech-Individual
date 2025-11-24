@@ -1,0 +1,14 @@
+{# shelter/templates/shelter/adoption_gate.html #}
+{% extends 'shelter/base.html' %}
+
+{% block content %}
+<div class="container">
+  <h2>Login required</h2>
+  <p>To apply for adoption, please log in or create an account.</p>
+
+  <div style="display:flex; gap:1rem;">
+        <a class="btn" href="{% url 'site_login' %}?next={{ next|urlencode }}">Login</a>
+    <a class="btn" href="{% url 'register' %}?next={{ next|urlencode }}">Register</a>
+  </div>
+</div>
+{% endblock %}

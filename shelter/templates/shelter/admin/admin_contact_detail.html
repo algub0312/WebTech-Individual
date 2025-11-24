@@ -1,0 +1,411 @@
+{% extends 'shelter/base.html' %}
+{% load static %}
+
+{% block title %}Contact Message - Admin Dashboard{% endblock %}
+
+{% block content %}
+<section class="admin-hero">
+    <div class="container">
+        <h1>Contact Message Details</h1>
+        <p class="lead">View and manage contact message from {{ contact.name }}</p>
+    </div>
+</section>
+
+<section class="admin-content">
+    <div class="container">
+        <div class="admin-layout">
+            <!-- Sidebar Navigation -->
+            <aside class="admin-sidebar">
+                <nav class="admin-nav">
+                    <div class="admin-profile-header">
+                        <h4>{{ user.first_name|default:user.username }}</h4>
+                        <p class="admin-role">Administrator</p>
+                    </div>
+                    <a href="{% url 'admin_dashboard' %}" class="nav-item">
+                        <span class="nav-icon">📊</span>
+                        Dashboard
+                    </a>
+                    <a href="{% url 'admin_applications' %}" class="nav-item">
+                        <span class="nav-icon">📝</span>
+                        All Applications
+                    </a>
+                    <a href="{% url 'admin_pets' %}" class="nav-item">
+                        <span class="nav-icon">🐾</span>
+                        Manage Pets
+                    </a>
+                    <a href="{% url 'admin_contacts' %}" class="nav-item active">
+                        <span class="nav-icon">📞</span>
+                        Contact Messages
+                    </a>
+                    <a href="/admin/" class="nav-item">
+                        <span class="nav-icon">⚙️</span>
+                        Django Admin
+                    </a>
+                    <div class="nav-divider"></div>
+                    <a href="{% url 'pets' %}" class="nav-item">
+                        <span class="nav-icon">🏠</span>
+                        Public Site
+                    </a>
+                    <a href="{% url 'logout' %}" class="nav-item">
+                        <span class="nav-icon">🚪</span>
+                        Logout
+                    </a>
+                </nav>
+            </aside>
+
+            <!-- Main Content -->
+            <div class="admin-main">
+                <!-- Back Navigation -->
+                <div class="back-nav">
+                    <a href="{% url 'admin_contacts' %}" class="btn btn-outline">← Back to Contact Messages</a>
+                </div>
+
+                <!-- Contact Message Details -->
+                <div class="contact-detail-section">
+                    <!-- Header with Status -->
+                    <div class="contact-header">
+                        <div class="contact-title">
+                            <h2>{{ contact.subject }}</h2>
+                            <div class="contact-meta">
+                                <span class="contact-date">{{ contact.created_at|date:"F d, Y g:i A" }}</span>
+                                {% if not contact.is_read %}
+                                <span class="status-badge status-new">New</span>
+                                {% elif not contact.is_responded %}
+                                <span class="status-badge status-read">Read</span>
+                                {% else %}
+                                <span class="status-badge status-responded">Responded</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Quick Actions -->
+                        <div class="contact-actions">
+                            <a href="mailto:{{ contact.email }}?subject=Re: {{ contact.subject }}" class="btn btn-primary">
+                                📧 Reply via Email
+                            </a>
+                            {% if contact.phone %}
+                            <a href="tel:{{ contact.phone }}" class="btn btn-secondary">
+                                📞 Call {{ contact.phone }}
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Sender Information -->
+                    <div class="sender-info-card">
+                        <h3>Contact Information</h3>
+                        <div class="sender-details">
+                            <div class="info-row">
+                                <span class="label">Name:</span>
+                                <span class="value">{{ contact.name }}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="label">Email:</span>
+                                <span class="value">
+                                    <a href="mailto:{{ contact.email }}">{{ contact.email }}</a>
+                                </span>
+                            </div>
+                            {% if contact.phone %}
+                            <div class="info-row">
+                                <span class="label">Phone:</span>
+                                <span class="value">
+                                    <a href="tel:{{ contact.phone }}">{{ contact.phone }}</a>
+                                </span>
+                            </div>
+                            {% endif %}
+                            <div class="info-row">
+                                <span class="label">Sent:</span>
+                                <span class="value">{{ contact.created_at|date:"F d, Y g:i A" }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Message Content -->
+                    <div class="message-content-card">
+                        <h3>Message</h3>
+                        <div class="message-text">
+                            {{ contact.message|linebreaks }}
+                        </div>
+                    </div>
+
+                    <!-- Status Management -->
+                    <div class="status-management-card">
+                        <h3>Message Status</h3>
+                        <div class="status-actions">
+                            {% if not contact.is_responded %}
+                            <form method="post" action="{% url 'admin_update_contact_status' contact.id %}" style="display: inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="mark_responded">
+                                <button type="submit" class="btn btn-success">
+                                    ✅ Mark as Responded
+                                </button>
+                            </form>
+                            {% else %}
+                            <form method="post" action="{% url 'admin_update_contact_status' contact.id %}" style="display: inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="mark_unresponded">
+                                <button type="submit" class="btn btn-outline">
+                                    ↩️ Mark as Not Responded
+                                </button>
+                            </form>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="status-info">
+                            <p><strong>Current Status:</strong> 
+                                {% if not contact.is_read %}
+                                    New message (not read)
+                                {% elif not contact.is_responded %}
+                                    Read but not responded
+                                {% else %}
+                                    Responded
+                                {% endif %}
+                            </p>
+                            {% if contact.is_read %}
+                            <p><small>First read: {{ contact.created_at|date:"F d, Y g:i A" }}</small></p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+.admin-hero {
+    background: linear-gradient(135deg, var(--accent-color) 0%, var(--primary-color) 100%);
+    color: var(--white);
+    padding: var(--spacing-2xl) 0;
+    text-align: center;
+}
+
+.admin-content {
+    padding: var(--spacing-3xl) 0;
+}
+
+.admin-layout {
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    gap: var(--spacing-3xl);
+}
+
+.admin-sidebar {
+    position: sticky;
+    top: 100px;
+    height: fit-content;
+}
+
+.admin-nav {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    box-shadow: var(--shadow-md);
+}
+
+.admin-profile-header {
+    text-align: center;
+    padding: var(--spacing-lg) 0;
+    border-bottom: 2px solid var(--background);
+    margin-bottom: var(--spacing-lg);
+}
+
+.admin-profile-header h4 {
+    color: var(--accent-color);
+    margin-bottom: var(--spacing-xs);
+}
+
+.admin-role {
+    color: var(--text-light);
+    font-size: var(--font-size-sm);
+    margin: 0;
+}
+
+.nav-divider {
+    height: 1px;
+    background: var(--background);
+    margin: var(--spacing-md) 0;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+    color: var(--text-dark);
+    text-decoration: none;
+    border-radius: var(--radius-md);
+    transition: var(--transition);
+    margin-bottom: var(--spacing-sm);
+}
+
+.nav-item:hover {
+    background: var(--background);
+}
+
+.nav-item.active {
+    background: var(--accent-color);
+    color: var(--white);
+}
+
+.nav-icon {
+    font-size: var(--font-size-xl);
+}
+
+.admin-main {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xl);
+}
+
+.back-nav {
+    margin-bottom: var(--spacing-lg);
+}
+
+.contact-detail-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+}
+
+.contact-header {
+    background: var(--white);
+    padding: var(--spacing-xl);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--spacing-lg);
+}
+
+.contact-title h2 {
+    color: var(--accent-color);
+    margin-bottom: var(--spacing-sm);
+}
+
+.contact-meta {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    flex-wrap: wrap;
+}
+
+.contact-date {
+    color: var(--text-light);
+    font-size: var(--font-size-sm);
+}
+
+.status-badge {
+    display: inline-block;
+    padding: var(--spacing-xs) var(--spacing-md);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.status-new {
+    background: var(--primary-color);
+    color: var(--white);
+}
+
+.status-read {
+    background: var(--warning);
+    color: var(--text-dark);
+}
+
+.status-responded {
+    background: var(--success);
+    color: var(--white);
+}
+
+.contact-actions {
+    display: flex;
+    gap: var(--spacing-md);
+    flex-wrap: wrap;
+}
+
+.sender-info-card,
+.message-content-card,
+.status-management-card {
+    background: var(--white);
+    padding: var(--spacing-xl);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+}
+
+.sender-info-card h3,
+.message-content-card h3,
+.status-management-card h3 {
+    color: var(--accent-color);
+    margin-bottom: var(--spacing-lg);
+    border-bottom: 2px solid var(--background);
+    padding-bottom: var(--spacing-sm);
+}
+
+.sender-details {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.info-row {
+    display: flex;
+    gap: var(--spacing-md);
+    align-items: center;
+}
+
+.info-row .label {
+    font-weight: 600;
+    color: var(--text-dark);
+    min-width: 80px;
+}
+
+.info-row .value {
+    color: var(--text-light);
+}
+
+.info-row .value a {
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+.info-row .value a:hover {
+    text-decoration: underline;
+}
+
+.message-text {
+    background: var(--background);
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-md);
+    border-left: 4px solid var(--accent-color);
+    line-height: 1.6;
+    color: var(--text-dark);
+    white-space: pre-wrap;
+}
+
+.status-actions {
+    margin-bottom: var(--spacing-lg);
+}
+
+.status-info {
+    background: var(--background);
+    padding: var(--spacing-md);
+    border-radius: var(--radius-md);
+}
+
+.status-info p {
+    margin: var(--spacing-xs) 0;
+}
+
+.status-info small {
+    color: var(--text-light);
+}
+
+.lead {
+    font-size: var(--font-size-xl);
+    opacity: 0.9;
+}
+</style>
+{% endblock %}
