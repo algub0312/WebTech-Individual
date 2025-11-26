@@ -1,0 +1,45 @@
+/* ============================================
+   TYPOGRAPHY
+   Defines how text is styled throughout the
+   application, including headings, paragraphs,
+   and special text treatments
+   ============================================ */
+
+/* Headings - establishing visual hierarchy */
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 700;              /* Bold for emphasis */
+    line-height: 1.2;              /* Tighter line-height for headings */
+    margin-bottom: var(--spacing-md);
+}
+
+/* Individual heading sizes - each has a specific purpose */
+h1 { 
+    font-size: var(--font-size-4xl);  /* Page titles, hero headings */
+}
+
+h2 { 
+    font-size: var(--font-size-3xl);  /* Section headings */
+}
+
+h3 { 
+    font-size: var(--font-size-2xl);  /* Subsection headings */
+}
+
+h4 { 
+    font-size: var(--font-size-xl);   /* Card titles, smaller sections */
+}
+
+h5 { 
+    font-size: var(--font-size-lg);   /* Minor headings */
+}
+
+h6 { 
+    font-size: var(--font-size-base); /* Smallest heading, rarely used */
+}
+
+/* Container utility - centers content and adds horizontal padding */
+.container {
+    max-width: 1200px;             /* Prevents content from being too wide */
+    margin: 0 auto;                /* Centers horizontally */
+    padding: 0 var(--spacing-xl);  /* Breathing room on sides */
+}

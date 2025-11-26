@@ -1,0 +1,182 @@
+/* ============================================
+   PETS PAGE STYLES
+   Styles for the pets browsing page with
+   filters, search, and pet grid
+   ============================================ */
+
+/* Hero section specific to pets page */
+.pets-hero {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+    color: white;
+    padding: 4rem 0 3rem;
+    text-align: center;
+}
+
+.pets-hero h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.pets-hero p {
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+    opacity: 0.9;
+}
+
+/* Quick search bar in hero */
+.quick-search {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.search-input {
+    flex: 1;
+    padding: 1rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+}
+
+.search-btn {
+    padding: 1rem 2rem;
+    background: var(--secondary-color);
+    color: var(--text-dark);
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.search-btn:hover {
+    background: var(--warning);
+    transform: translateY(-2px);
+}
+
+/* Main content area */
+.pets-content {
+    padding: 3rem 0;
+}
+
+/* Layout: sidebar on left, main content on right */
+.pets-layout {
+    display: grid;
+    grid-template-columns: 300px 1fr;  /* Fixed sidebar width, flexible content */
+    gap: 3rem;
+    align-items: start;
+}
+
+/* Filters sidebar - sticky so it stays visible while scrolling */
+.filters-sidebar {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    position: sticky;
+    top: 2rem;                      /* Stays 2rem from top when scrolling */
+}
+
+.filters-container h3 {
+    margin-bottom: 1.5rem;
+    color: var(--primary-color);
+    border-bottom: 2px solid var(--primary-color);
+    padding-bottom: 0.5rem;
+}
+
+.filter-group {
+    margin-bottom: 2rem;
+}
+
+.filter-group h4 {
+    margin-bottom: 1rem;
+    color: var(--text-dark);
+    font-size: 1.1rem;
+}
+
+.clear-filters {
+    width: 100%;
+    margin-top: 1rem;
+}
+
+/* Results header with count and sorting */
+.results-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--gray-light);
+}
+
+.results-info h2 {
+    margin-bottom: 0.5rem;
+    color: var(--text-dark);
+}
+
+.results-count {
+    color: var(--text-light);
+    font-size: 0.9rem;
+}
+
+.sort-options {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* No results state */
+.no-results {
+    grid-column: 1 / -1;            /* Spans all columns */
+    text-align: center;
+    padding: 3rem;
+}
+
+.no-results-content {
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+/* Pagination controls */
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 2rem;
+}
+
+.pagination {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+}
+
+.page-info {
+    padding: 0.75rem 1.5rem;
+    color: var(--text-light);
+    font-weight: 500;
+}
+
+.pagination-btn {
+    padding: 0.75rem 1.5rem;
+    background: var(--primary-color);
+    color: var(--white);
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: var(--transition);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.pagination-btn:hover {
+    background: var(--accent-color);
+    transform: translateY(-2px);
+}
+
+.pagination-btn:disabled {
+    background: var(--gray-medium);
+    cursor: not-allowed;
+    transform: none;                /* No hover effect when disabled */
+}

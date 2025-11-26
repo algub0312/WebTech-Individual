@@ -1,0 +1,44 @@
+/* ============================================
+   BADGES
+   Small labels used to highlight status,
+   categories, or important information. They're
+   typically used in cards, lists, or next to text
+   ============================================ */
+
+/* Base badge styles */
+.badge {
+    display: inline-block;
+    padding: var(--spacing-xs) var(--spacing-md);
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    text-transform: uppercase;      /* Makes text stand out more */
+    letter-spacing: 0.5px;          /* Improves readability at small sizes */
+    border-radius: var(--radius-md);
+    line-height: 1;                 /* Prevents extra vertical space */
+}
+
+/* Badge color variants - each communicates different meaning */
+.badge-primary {
+    background-color: var(--primary-color);
+    color: var(--white);
+}
+
+.badge-secondary {
+    background-color: var(--secondary-color);
+    color: var(--text-dark);
+}
+
+/* Pet-specific badges for cards */
+.pet-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: var(--secondary-color);
+    color: var(--text-dark);
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    z-index: 10;                    /* Ensures it appears above the image */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}

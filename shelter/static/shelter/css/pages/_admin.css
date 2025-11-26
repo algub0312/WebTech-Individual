@@ -1,0 +1,259 @@
+/* ============================================
+   ADMIN DASHBOARD STYLES
+   Styles specific to the admin area. Admin
+   interfaces prioritize information density
+   and efficiency over visual appeal
+   ============================================ */
+
+/* Admin hero section - distinct color scheme */
+.admin-hero {
+    background: linear-gradient(135deg, var(--accent-color) 0%, var(--primary-color) 100%);
+    color: var(--white);
+    padding: var(--spacing-2xl) 0;
+    text-align: center;
+}
+
+/* Badge showing admin role */
+.admin-badge {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.2);
+    padding: var(--spacing-sm) var(--spacing-lg);
+    border-radius: var(--radius-lg);
+    font-weight: 600;
+    margin-bottom: var(--spacing-sm);
+}
+
+.admin-user-info p {
+    opacity: 0.9;
+    margin: var(--spacing-sm) 0;
+}
+
+/* Main admin content area */
+.admin-content {
+    padding: var(--spacing-3xl) 0;
+}
+
+/* Layout: sidebar navigation + main content */
+.admin-layout {
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    gap: var(--spacing-3xl);
+}
+
+/* Sticky sidebar navigation */
+.admin-sidebar {
+    position: sticky;
+    top: 100px;                      /* Accounts for site header */
+    height: fit-content;
+}
+
+.admin-nav {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    box-shadow: var(--shadow-md);
+}
+
+/* Admin profile section at top of sidebar */
+.admin-profile-header {
+    text-align: center;
+    padding: var(--spacing-lg) 0;
+    border-bottom: 2px solid var(--background);
+    margin-bottom: var(--spacing-lg);
+}
+
+.admin-profile-header h4 {
+    color: var(--accent-color);
+    margin-bottom: var(--spacing-xs);
+}
+
+.admin-role {
+    color: var(--text-light);
+    font-size: var(--font-size-sm);
+    margin: 0;
+}
+
+/* Visual separator between nav sections */
+.nav-divider {
+    height: 1px;
+    background: var(--background);
+    margin: var(--spacing-md) 0;
+}
+
+/* Main admin content area */
+.admin-main {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xl);
+}
+
+/* White card sections within admin area */
+.stats-overview,
+.recent-applications,
+.recent-contacts,
+.filters-section,
+.applications-section,
+.contacts-section,
+.pets-section,
+.pets-stats {
+    background: var(--white);
+    padding: var(--spacing-xl);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+}
+
+/* Section headers with optional action buttons */
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-xl);
+}
+
+.section-header h2 {
+    color: var(--accent-color);
+    margin-bottom: 0;
+}
+
+/* Stats grid on dashboard */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--spacing-lg);
+}
+
+.stat-card {
+    background: var(--background);
+    padding: var(--spacing-xl);
+    border-radius: var(--radius-md);
+    text-align: center;
+    position: relative;
+    transition: var(--transition);
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+}
+
+.stat-icon {
+    position: absolute;
+    top: var(--spacing-md);
+    right: var(--spacing-md);
+    font-size: 1.5rem;
+    opacity: 0.5;
+}
+
+/* Application and contact rows - compact data display */
+.application-row,
+.contact-row {
+    display: grid;
+    grid-template-columns: 2fr auto auto;
+    gap: var(--spacing-lg);
+    padding: var(--spacing-lg);
+    background: var(--background);
+    border-radius: var(--radius-md);
+    align-items: center;
+    margin-bottom: var(--spacing-lg);
+}
+
+/* Status badges with semantic colors */
+.status-badge {
+    display: inline-block;
+    padding: var(--spacing-xs) var(--spacing-md);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+/* Different colors for different statuses - instant visual recognition */
+.status-pending {
+    background: var(--warning);
+    color: var(--text-dark);
+}
+
+.status-approved {
+    background: var(--success);
+    color: var(--white);
+}
+
+.status-rejected {
+    background: var(--danger);
+    color: var(--white);
+}
+
+.status-completed {
+    background: var(--accent-color);
+    color: var(--white);
+}
+
+.status-new {
+    background: var(--primary-color);
+    color: var(--white);
+}
+
+/* Compact buttons for dense admin interfaces */
+.btn-compact {
+    display: inline-block;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none;
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: var(--transition);
+    min-width: 40px;
+    line-height: 1.2;
+}
+
+/* Status select dropdowns with colored backgrounds */
+.status-select {
+    padding: var(--spacing-sm);
+    border: 2px solid var(--gray-medium);
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* Each status gets its own background color for instant recognition */
+.status-select.status-pending {
+    background: var(--warning);
+    color: var(--text-dark);
+}
+
+.status-select.status-approved {
+    background: var(--success);
+    color: var(--white);
+}
+
+.status-select.status-rejected {
+    background: var(--danger);
+    color: var(--white);
+}
+
+.status-select.status-completed {
+    background: var(--accent-color);
+    color: var(--white);
+}
+
+/* Filter form controls */
+.filter-form {
+    display: flex;
+    gap: var(--spacing-md);
+    align-items: center;
+}
+
+.filter-form select,
+.search-input {
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: 2px solid var(--gray-medium);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+}
+
+.search-input {
+    min-width: 250px;
+}

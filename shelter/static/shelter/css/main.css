@@ -1,0 +1,120 @@
+/* ============================================
+   PAWHAVEN PET SHELTER - MAIN STYLESHEET
+   
+   This is the main entry point for all CSS.
+   It imports modular stylesheets in a specific
+   order to ensure proper cascading and override
+   behavior.
+   
+   Organization Philosophy:
+   - Base styles establish the foundation
+   - Layout defines the structure
+   - Components are reusable UI pieces
+   - Pages contain page-specific overrides
+   
+   Import Order Matters!
+   Later imports can override earlier ones,
+   so we go from general to specific.
+   ============================================ */
+
+/* ============================================
+   LAYER 1: BASE STYLES
+   These are the foundation - they affect
+   everything and set up our design system
+   ============================================ */
+
+/* Variables must come first - everything else depends on them */
+@import url('base/_variables.css');
+
+/* Reset comes second - normalizes browser defaults */
+@import url('base/_reset.css');
+
+/* Typography establishes text hierarchy */
+@import url('base/_typography.css');
+
+/* ============================================
+   LAYER 2: LAYOUT
+   Structural elements that create the page
+   skeleton - header, navigation, footer
+   ============================================ */
+
+@import url('layout/_header.css');
+@import url('layout/_navigation.css');
+@import url('layout/_footer.css');
+
+/* ============================================
+   LAYER 3: COMPONENTS
+   Reusable UI elements that can appear
+   anywhere in the application. These should
+   be context-independent and work everywhere
+   ============================================ */
+
+@import url('components/_buttons.css');
+@import url('components/_badges.css');
+@import url('components/_cards.css');
+@import url('components/_forms.css');
+
+/* ============================================
+   LAYER 4: PAGE-SPECIFIC STYLES
+   These build on top of components and can
+   override them for specific page contexts.
+   They come last so they have highest specificity
+   ============================================ */
+
+@import url('pages/_home.css');
+@import url('pages/_pets.css');
+@import url('pages/_adoption.css');
+@import url('pages/_admin.css');
+
+/* ============================================
+   UTILITY CLASSES
+   Helper classes that can be applied anywhere
+   for quick styling adjustments
+   ============================================ */
+
+/* Messages and alerts - for Django messages framework */
+.messages-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--spacing-md) var(--spacing-xl);
+}
+
+.alert {
+    padding: var(--spacing-md) var(--spacing-lg);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--spacing-md);
+    font-weight: 500;
+}
+
+.alert-success {
+    background: var(--success);
+    color: var(--white);
+}
+
+.alert-error, 
+.alert-danger {
+    background: var(--danger);
+    color: var(--white);
+}
+
+.alert-warning {
+    background: var(--warning);
+    color: var(--text-dark);
+}
+
+.alert-info {
+    background: var(--accent-color);
+    color: var(--white);
+}
+
+/* ============================================
+   DEBUG HELPERS (comment out in production)
+   Uncomment these to visualize layout structure
+   during development
+   ============================================ */
+
+/*
+* {
+    outline: 1px solid red;
+}
+*/
