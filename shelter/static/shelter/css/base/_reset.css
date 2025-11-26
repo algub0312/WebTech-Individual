@@ -1,0 +1,50 @@
+/* ============================================
+   CSS RESET AND BASE STYLES
+   These styles normalize browser defaults
+   and set up base HTML element styling
+   ============================================ */
+
+/* Universal reset - removes default spacing */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;  /* Makes width calculations easier */
+}
+
+/* Base HTML and body setup */
+html {
+    font-size: 16px;          /* Sets 1rem = 16px for easier calculations */
+    line-height: 1.6;         /* Comfortable reading line height */
+}
+
+body {
+    font-family: var(--font-family);
+    color: var(--text-dark);
+    background-color: var(--background);
+    line-height: 1.6;
+    min-width: 1024px;        /* Prevents layout breaking on very small screens */
+}
+
+/* Images - responsive by default */
+img {
+    max-width: 100%;          /* Never overflow container */
+    height: auto;             /* Maintain aspect ratio */
+    display: block;           /* Removes bottom spacing caused by inline display */
+}
+
+/* Links - basic styling */
+a {
+    color: var(--primary-color);
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+a:hover {
+    color: var(--accent-color);
+}
+
+/* Focus styles for accessibility */
+*:focus {
+    outline: 3px solid var(--accent-color);
+    outline-offset: 2px;
+}

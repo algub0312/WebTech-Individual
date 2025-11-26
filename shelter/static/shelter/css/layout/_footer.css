@@ -1,0 +1,82 @@
+/* ============================================
+   FOOTER
+   Site-wide footer with multiple columns of
+   information and links
+   ============================================ */
+
+.main-footer {
+    background: var(--text-dark);
+    color: var(--white);
+    padding: var(--spacing-3xl) 0 var(--spacing-xl);
+}
+
+.footer-content {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);  /* Four equal columns */
+    gap: var(--spacing-2xl);
+    margin-bottom: var(--spacing-2xl);
+}
+
+.footer-section h4 {
+    color: var(--secondary-color);
+    margin-bottom: var(--spacing-lg);
+    font-size: var(--font-size-lg);
+}
+
+.footer-section ul {
+    list-style: none;
+}
+
+.footer-section ul li {
+    margin-bottom: var(--spacing-sm);
+}
+
+.footer-section a {
+    color: var(--gray-light);
+    transition: var(--transition);
+    font-size: var(--font-size-base);
+}
+
+.footer-section a:hover {
+    color: var(--secondary-color);
+}
+
+/* Social media links */
+.social-links {
+    display: flex;
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-lg);
+}
+
+.social-links a {
+    width: 45px;
+    height: 45px;
+    background: var(--primary-color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--font-size-lg);
+    transition: var(--transition);
+}
+
+.social-links a:hover {
+    background: var(--secondary-color);
+    transform: translateY(-3px);
+}
+
+/* Contact info and hours */
+.contact-info p,
+.hours p {
+    margin-bottom: var(--spacing-sm);
+    color: var(--gray-light);
+    font-size: var(--font-size-base);
+}
+
+/* Footer bottom section */
+.footer-bottom {
+    padding-top: var(--spacing-lg);
+    border-top: 1px solid #555;
+    text-align: center;
+    color: var(--text-muted);
+}

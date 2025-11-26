@@ -1,0 +1,166 @@
+/* ============================================
+   HOMEPAGE STYLES
+   Styles specific to the homepage, including
+   hero section, stats section, and featured pets
+   ============================================ */
+
+/* Hero section - the big visual at the top that grabs attention */
+.hero-section {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+    color: var(--white);
+    padding: var(--spacing-3xl) 0;
+}
+
+.hero-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--spacing-xl);
+    display: grid;
+    grid-template-columns: 1fr 1fr;  /* Text left, image right */
+    gap: var(--spacing-3xl);
+    align-items: center;
+}
+
+.hero-title {
+    font-size: 3.5rem;
+    margin-bottom: var(--spacing-lg);
+    line-height: 1.1;               /* Tight line-height for impact */
+}
+
+.hero-subtitle {
+    font-size: 2.5rem;
+    margin-bottom: var(--spacing-2xl);
+    line-height: 1.4;
+    opacity: 0.9;                   /* Slightly transparent for hierarchy */
+}
+
+.hero-buttons {
+    display: flex;
+    gap: var(--spacing-lg);
+}
+
+.hero-image img {
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-lg);
+    width: 100%;
+    height: 400px;
+    object-fit: cover;
+}
+
+/* Stats section - displays key metrics */
+.stats-section {
+    background: var(--white);
+    padding: var(--spacing-3xl) 0;
+    margin-top: -2rem;              /* Overlaps hero slightly for modern effect */
+    position: relative;
+    z-index: 10;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--spacing-xl);
+}
+
+/* Featured pets section */
+.featured-pets {
+    padding: var(--spacing-3xl);
+    background: var(--background);
+}
+
+.section-header {
+    text-align: center;
+    margin-bottom: var(--spacing-3xl);
+}
+
+.section-header h2 {
+    color: var(--text-dark);
+    margin-bottom: var(--spacing-md);
+}
+
+.section-header p {
+    font-size: var(--font-size-lg);
+    color: var(--text-light);
+}
+
+/* Pet grid - responsive grid for pet cards */
+.pets-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);  /* Three columns on desktop */
+    gap: var(--spacing-2xl);
+    margin-bottom: var(--spacing-2xl);
+}
+
+.section-footer {
+    text-align: center;
+}
+
+/* Call to action section */
+.cta-section {
+    background: var(--gray-light);
+    padding: var(--spacing-3xl);
+    text-align: center;
+}
+
+.cta-content h2 {
+    margin-bottom: var(--spacing-lg);
+    color: var(--text-dark);
+}
+
+.cta-content p {
+    font-size: var(--font-size-lg);
+    color: var(--text-light);
+    margin-bottom: var(--spacing-2xl);
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Quick links section */
+.quick-links {
+    background: var(--white);
+    padding: var(--spacing-xl);
+    border-top: 1px solid var(--gray-medium);
+}
+
+.quick-links h3 {
+    text-align: center;
+    margin-bottom: var(--spacing-2xl);
+    color: var(--text-dark);
+    font-size: var(--font-size-2xl);
+}
+
+.links-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--spacing-xl);
+}
+
+.quick-link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: var(--spacing-xl);
+    background: var(--background);
+    border-radius: var(--radius-lg);
+    transition: var(--transition);
+    text-decoration: none;
+    color: var(--text-dark);
+}
+
+.quick-link:hover {
+    background: var(--primary-color);
+    color: var(--white);
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-md);
+}
+
+.link-icon {
+    font-size: 2.5rem;
+    margin-bottom: var(--spacing-md);
+}
+
+.link-text {
+    font-weight: 600;
+    font-size: var(--font-size-lg);
+}

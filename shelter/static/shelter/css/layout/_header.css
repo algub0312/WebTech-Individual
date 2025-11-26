@@ -1,0 +1,27 @@
+/* ============================================
+   HEADER AND MAIN NAVIGATION
+   The main header contains the logo and
+   primary navigation menu. It's sticky,
+   meaning it stays visible as users scroll
+   ============================================ */
+
+.main-header {
+    background: var(--white);
+    box-shadow: var(--shadow-md);    /* Subtle shadow gives depth */
+    position: sticky;                /* Stays at top when scrolling */
+    top: 0;
+    z-index: 1000;                   /* Ensures it stays above other content */
+}
+
+.navbar {
+    padding: var(--spacing-lg) 0;
+}
+
+.nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--spacing-xl);
+    display: flex;
+    justify-content: space-between;  /* Logo left, menu right */
+    align-items: center;
+}
