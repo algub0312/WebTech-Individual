@@ -1,0 +1,67 @@
+/* ============================================
+   CSS CUSTOM PROPERTIES (DESIGN SYSTEM)
+   These variables define the core visual
+   language of the application and should be
+   used throughout all other stylesheets
+   ============================================ */
+
+:root {
+    /* COLORS - Main brand colors and semantic colors */
+    --primary-color: #2E8B57;        /* Sea Green - main brand color */
+    --secondary-color: #FFB347;       /* Peach - accent/highlight color */
+    --accent-color: #4169E1;          /* Royal Blue - call-to-action color */
+    
+    /* Text colors for different contexts */
+    --text-dark: #333333;             /* Primary text color */
+    --text-light: #666666;            /* Secondary text color */
+    --text-muted: #999999;            /* Tertiary/disabled text */
+    
+    /* Background and surface colors */
+    --background: #F8F9FA;            /* Page background */
+    --white: #FFFFFF;                 /* Pure white for cards/surfaces */
+    
+    /* Grayscale for borders and dividers */
+    --gray-light: #E9ECEF;
+    --gray-medium: #DEE2E6;
+    
+    /* Semantic colors for feedback */
+    --success: #28A745;               /* Success messages/states */
+    --warning: #FFC107;               /* Warning messages/states */
+    --danger: #DC3545;                /* Error messages/states */
+
+    /* TYPOGRAPHY - Font settings */
+    --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    
+    /* Font sizes - using rem for accessibility */
+    --font-size-xs: 0.75rem;          /* 12px - very small text */
+    --font-size-sm: 0.875rem;         /* 14px - small text */
+    --font-size-base: 1rem;           /* 16px - body text */
+    --font-size-lg: 1.125rem;         /* 18px - slightly larger */
+    --font-size-xl: 1.25rem;          /* 20px - subheadings */
+    --font-size-2xl: 1.5rem;          /* 24px - small headings */
+    --font-size-3xl: 1.875rem;        /* 30px - medium headings */
+    --font-size-4xl: 2.5rem;          /* 40px - large headings */
+
+    /* SPACING - Consistent spacing scale */
+    --spacing-xs: 0.25rem;            /* 4px */
+    --spacing-sm: 0.5rem;             /* 8px */
+    --spacing-md: 1rem;               /* 16px */
+    --spacing-lg: 1.5rem;             /* 24px */
+    --spacing-xl: 2rem;               /* 32px */
+    --spacing-2xl: 3rem;              /* 48px */
+    --spacing-3xl: 4rem;              /* 64px */
+
+    /* SHADOWS - Depth and elevation */
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.15);
+    
+    /* BORDER RADIUS - Rounded corners */
+    --radius-sm: 0.25rem;             /* Subtle rounding */
+    --radius-md: 0.5rem;              /* Standard rounding */
+    --radius-lg: 0.75rem;             /* More pronounced */
+    --radius-xl: 1rem;                /* Very rounded */
+    
+    /* TRANSITIONS - Consistent animation timing */
+    --transition: all 0.3s ease;
+}

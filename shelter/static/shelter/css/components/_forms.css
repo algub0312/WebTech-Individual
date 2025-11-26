@@ -1,0 +1,145 @@
+/* ============================================
+   FORMS AND FORM ELEMENTS
+   Form styling with focus on accessibility,
+   clarity, and user feedback. Good form design
+   can make the difference between a completed
+   adoption application and an abandoned one
+   ============================================ */
+
+/* Form group - wrapper for label + input pairs */
+.form-group {
+    margin-bottom: var(--spacing-lg);
+}
+
+/* Labels - should be clear and readable */
+.form-group label {
+    display: block;
+    margin-bottom: var(--spacing-sm);
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+/* All form input types - text, email, tel, textarea, select */
+.form-control,
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: var(--spacing-md);
+    border: 2px solid var(--gray-medium);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-base);
+    font-family: inherit;           /* Ensures form fields match body text */
+    transition: var(--transition);
+}
+
+/* Focus state - critical for accessibility and user feedback */
+.form-control:focus,
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;                  /* Remove default browser outline */
+    border-color: var(--primary-color);  /* Show our custom focus indicator */
+    box-shadow: 0 0 0 3px rgba(46, 139, 87, 0.1);  /* Subtle glow effect */
+}
+
+/* Select dropdowns need special cursor treatment */
+select.form-control {
+    cursor: pointer;
+}
+
+/* Form rows - for side-by-side fields (like first name + last name) */
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-lg);
+}
+
+/* Helper text below form fields */
+.form-help {
+    display: block;
+    margin-top: var(--spacing-xs);
+    color: var(--text-light);
+    font-size: var(--font-size-sm);
+}
+
+/* Error messages - highly visible for validation feedback */
+.form-errors {
+    background: #fee;               /* Very light red background */
+    border: 2px solid var(--danger);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+}
+
+.form-errors .error {
+    color: var(--danger);
+    margin: var(--spacing-xs) 0;
+}
+
+/* Checkbox and radio button styling */
+.checkbox-label {
+    display: flex;
+    align-items: flex-start;        /* Aligns checkbox with first line of text */
+    gap: var(--spacing-md);
+    cursor: pointer;
+    font-weight: normal;
+}
+
+.checkbox-label input[type="checkbox"],
+.checkbox-label input[type="radio"] {
+    margin-top: 4px;                /* Aligns better with text baseline */
+    transform: scale(1.2);          /* Makes them easier to click */
+    cursor: pointer;
+}
+
+/* Special agreement checkboxes (like terms of service) */
+.form-agreement {
+    background: var(--background);
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-md);
+    margin: var(--spacing-xl) 0;
+}
+
+/* Form select dropdown styling */
+.form-select {
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: 2px solid var(--gray-medium);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-base);
+    cursor: pointer;
+    background-color: var(--white);
+}
+
+.form-select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+/* Filter options - used in pet search sidebar */
+.filter-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.filter-option {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 6px;
+    transition: background-color 0.2s ease;
+}
+
+.filter-option:hover {
+    background-color: var(--gray-light);
+}
+
+.filter-option input[type="radio"],
+.filter-option input[type="checkbox"] {
+    margin: 0;
+    transform: scale(1.2);
+    accent-color: var(--primary-color);  /* Modern browsers: colors the checkbox/radio */
+}

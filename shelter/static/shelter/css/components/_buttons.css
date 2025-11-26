@@ -1,3 +1,12 @@
+/* ============================================
+   BUTTONS
+   Reusable button styles with different
+   variants for different purposes. Buttons are
+   one of the most important UI elements as they
+   drive user actions
+   ============================================ */
+
+/* Base button styles - shared by all button variants */
 .btn {
     display: inline-block;
     padding: var(--spacing-md) var(--spacing-xl);
@@ -10,14 +19,16 @@
     cursor: pointer;
     transition: var(--transition);
     min-width: 140px;
-    font-family: inherit;
+    font-family: inherit;          /* Ensures buttons use the same font as body */
 }
 
+/* Focus state for accessibility - visible keyboard navigation */
 .btn:focus {
     outline: 3px solid var(--accent-color);
     outline-offset: 2px;
 }
 
+/* Primary button - main call-to-action (e.g., "Submit", "Adopt Now") */
 .btn-primary {
     background-color: var(--primary-color);
     color: var(--white);
@@ -28,10 +39,11 @@
     background-color: var(--accent-color);
     border-color: var(--accent-color);
     color: var(--white);
-    transform: translateY(-3px);
+    transform: translateY(-3px);    /* Subtle lift effect on hover */
     box-shadow: var(--shadow-md);
 }
 
+/* Secondary button - less important actions */
 .btn-secondary {
     background-color: var(--secondary-color);
     color: var(--text-dark);
@@ -46,6 +58,7 @@
     box-shadow: var(--shadow-md);
 }
 
+/* Outline button - tertiary actions or when visual hierarchy needs more subtlety */
 .btn-outline {
     background-color: transparent;
     color: var(--primary-color);
@@ -58,10 +71,11 @@
     transform: translateY(-3px);
 }
 
+/* Button size variations */
 .btn-small {
     padding: var(--spacing-sm) var(--spacing-lg);
     font-size: var(--font-size-sm);
-    min-width: 180px;
+    min-width: 100px;
 }
 
 .btn-large {
@@ -70,55 +84,14 @@
     min-width: 180px;
 }
 
-/* Badge components */
-.badge {
-    display: inline-block;
-    padding: var(--spacing-xs) var(--spacing-md);
-    font-size: var(--font-size-xs);
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    border-radius: var(--radius-md);
-    line-height: 1;
-}
-
-.badge-primary {
-    background-color: var(--primary-color);
+/* Success button - for positive confirmations */
+.btn-success {
+    background: var(--success);
     color: var(--white);
+    border: 2px solid var(--success);
 }
 
-.badge-secondary {
-    background-color: var(--secondary-color);
-    color: var(--text-dark);
-}
-
-/* Force navbar to full width */
-.main-header {
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-}
-
-.navbar {
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-}
-
-.nav-container {
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-    max-width: 100% !important;
-    width: 100% !important;
-}
-
-.container {
-    padding-left: 1rem;
-    padding-right: 1rem;
-}
-
-/* Only remove padding for nav-container, not other containers */
-.navbar .container {
-    padding-left: 0 !important;
-    padding-right: 0 !important;
+.btn-success:hover {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
 }
