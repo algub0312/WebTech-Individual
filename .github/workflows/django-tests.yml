@@ -1,0 +1,126 @@
+name: Django CI
+
+# Când să ruleze acest workflow
+on:
+  push:
+    branches: [ main, master, develop ]  # Rulează la push pe aceste branch-uri
+  pull_request:
+    branches: [ main, master, develop ]  # Rulează la PR-uri către aceste branch-uri
+
+# Definirea job-urilor care vor rula
+jobs:
+  test:
+    name: Run Tests and Coverage
+    runs-on: ubuntu-latest  # Folosește o mașină virtuală Ubuntu
+    
+    strategy:
+      matrix:
+        python-version: [3.11, 3.12, 3.13]  # Testează pe multiple versiuni de Python
+    
+    steps:
+    # Step 1: Checkout code-ul din repository
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    # Step 2: Setup Python environment
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+        cache: 'pip'  # Cache pip packages pentru viteză
+    
+    # Step 3: Instalează dependencies
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    # Step 4: Rulează linting (code quality checks)
+    - name: Lint with flake8
+      run: |
+        pip install flake8
+        # Stop build dacă există syntax errors sau undefined names
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        # Warning pentru alte issues (dar nu oprește build-ul)
+        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+      continue-on-error: true  # Nu oprește workflow-ul dacă linting găsește issues
+    
+    # Step 5: Check for security vulnerabilities in dependencies
+    - name: Security check with Safety
+      run: |
+        pip install safety
+        safety check --json || true
+      continue-on-error: true
+    
+    # Step 6: Rulează migrările Django (verifică că DB schema este valid)
+    - name: Run migrations
+      run: |
+        python manage.py makemigrations --check --dry-run
+        python manage.py migrate
+    
+    # Step 7: Rulează toate testele
+    - name: Run tests
+      run: |
+        python manage.py test
+    
+    # Step 8: Rulează tests cu coverage
+    - name: Run tests with coverage
+      run: |
+        pip install coverage
+        coverage run --source='shelter' manage.py test shelter
+        coverage report
+        coverage xml  # Generează raport XML pentru upload
+    
+    # Step 9: Upload coverage la Codecov (serviciu gratuit pentru tracking coverage)
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v4
+      with:
+        file: ./coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: false
+    
+    # Step 10: Generează coverage badge
+    - name: Generate coverage badge
+      if: github.ref == 'refs/heads/main' && matrix.python-version == '3.13'
+      run: |
+        pip install coverage-badge
+        coverage-badge -o coverage.svg -f
+    
+    # Step 11: Upload coverage badge ca artifact
+    - name: Upload coverage badge
+      if: github.ref == 'refs/heads/main' && matrix.python-version == '3.13'
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-badge
+        path: coverage.svg
+
+  # Optional: Job separat pentru security scanning
+  security:
+    name: Security Scanning
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.13'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Run Bandit security scanner
+      run: |
+        pip install bandit
+        bandit -r shelter/ -f json -o bandit-report.json || true
+    
+    - name: Upload security report
+      uses: actions/upload-artifact@v4
+      with:
+        name: bandit-security-report
+        path: bandit-report.json
