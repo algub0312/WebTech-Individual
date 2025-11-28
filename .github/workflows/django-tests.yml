@@ -3,31 +3,27 @@ name: Django CI
 # Când să ruleze acest workflow
 on:
   push:
-    branches: [ main, master, develop ]  # Rulează la push pe aceste branch-uri
+    branches: [ main, master, develop ]
   pull_request:
-    branches: [ main, master, develop ]  # Rulează la PR-uri către aceste branch-uri
+    branches: [ main, master, develop ]
 
 # Definirea job-urilor care vor rula
 jobs:
   test:
     name: Run Tests and Coverage
-    runs-on: ubuntu-latest  # Folosește o mașină virtuală Ubuntu
-    
-    strategy:
-      matrix:
-        python-version: [3.11, 3.12, 3.13]  # Testează pe multiple versiuni de Python
+    runs-on: ubuntu-latest
     
     steps:
     # Step 1: Checkout code-ul din repository
     - name: Checkout code
       uses: actions/checkout@v4
     
-    # Step 2: Setup Python environment
-    - name: Set up Python ${{ matrix.python-version }}
+    # Step 2: Setup Python 3.13
+    - name: Set up Python 3.13
       uses: actions/setup-python@v5
       with:
-        python-version: ${{ matrix.python-version }}
-        cache: 'pip'  # Cache pip packages pentru viteză
+        python-version: '3.13'
+        cache: 'pip'
     
     # Step 3: Instalează dependencies
     - name: Install dependencies
@@ -43,7 +39,7 @@ jobs:
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         # Warning pentru alte issues (dar nu oprește build-ul)
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-      continue-on-error: true  # Nu oprește workflow-ul dacă linting găsește issues
+      continue-on-error: true
     
     # Step 5: Check for security vulnerabilities in dependencies
     - name: Security check with Safety
@@ -52,7 +48,7 @@ jobs:
         safety check --json || true
       continue-on-error: true
     
-    # Step 6: Rulează migrările Django (verifică că DB schema este valid)
+    # Step 6: Rulează migrările Django
     - name: Run migrations
       run: |
         python manage.py makemigrations --check --dry-run
@@ -69,9 +65,9 @@ jobs:
         pip install coverage
         coverage run --source='shelter' manage.py test shelter
         coverage report
-        coverage xml  # Generează raport XML pentru upload
+        coverage xml
     
-    # Step 9: Upload coverage la Codecov (serviciu gratuit pentru tracking coverage)
+    # Step 9: Upload coverage la Codecov (optional)
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v4
       with:
@@ -79,23 +75,22 @@ jobs:
         flags: unittests
         name: codecov-umbrella
         fail_ci_if_error: false
+      continue-on-error: true
     
     # Step 10: Generează coverage badge
     - name: Generate coverage badge
-      if: github.ref == 'refs/heads/main' && matrix.python-version == '3.13'
       run: |
         pip install coverage-badge
         coverage-badge -o coverage.svg -f
     
     # Step 11: Upload coverage badge ca artifact
     - name: Upload coverage badge
-      if: github.ref == 'refs/heads/main' && matrix.python-version == '3.13'
       uses: actions/upload-artifact@v4
       with:
         name: coverage-badge
         path: coverage.svg
 
-  # Optional: Job separat pentru security scanning
+  # Job separat pentru security scanning (rulează în paralel)
   security:
     name: Security Scanning
     runs-on: ubuntu-latest
@@ -104,10 +99,11 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
     
-    - name: Set up Python
+    - name: Set up Python 3.13
       uses: actions/setup-python@v5
       with:
         python-version: '3.13'
+        cache: 'pip'
     
     - name: Install dependencies
       run: |
