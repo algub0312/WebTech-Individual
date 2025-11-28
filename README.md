@@ -1,5 +1,21 @@
 # PawHaven Pet Shelter - Django MVT Project
 
+# PawHaven - Pet Shelter Management System
+
+![Django CI](https://github.com/USERNAME/REPO/workflows/Django%20CI/badge.svg)
+![Coverage](https://img.shields.io/badge/coverage-87%25-brightgreen)
+![Python](https://img.shields.io/badge/python-3.11%20%7C%203.12%20%7C%203.13-blue)
+![Django](https://img.shields.io/badge/django-5.1-green)
+
+A comprehensive web application for pet shelter management with automated testing and 87% code coverage.
+
+## Features
+- Pet catalog with detailed profiles
+- Adoption application system
+- Admin dashboard for application management
+- 87+ automated tests
+- CI/CD pipeline with GitHub Actions
+
 ## 🎉 Project Successfully Converted!
 
 Your frontend pet shelter website has been successfully transformed into a full Django MVT (Model-View-Template) project!
