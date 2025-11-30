@@ -2,7 +2,7 @@
 
 # PawHaven - Pet Shelter Management System
 
-![Django CI](https://github.com/AndaMita/WebTech-Individual/workflows/Django%20CI/badge.svg)
+![Django CI](https://github.com/algub0312/WebTech-Individual/workflows/Django%20CI/badge.svg)
 ![Coverage](https://img.shields.io/badge/coverage-87%25-brightgreen)
 ![Python](https://img.shields.io/badge/python-3.13-blue)
 ![Django](https://img.shields.io/badge/django-5.1-green)
